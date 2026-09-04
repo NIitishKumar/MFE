@@ -1,0 +1,35 @@
+{
+  "name": "Madhav Furnitures — Premium Furniture Showroom",
+  "short_name": "Madhav Furnitures",
+  "description": "Architectural furniture, slow craftsmanship, and tactile sanctuaries for modern living.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FDFBF7",
+  "theme_color": "#FDFBF7",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Explore Catalog",
+      "url": "/shop",
+      "description": "Browse handcrafted furniture"
+    },
+    {
+      "name": "Showroom Sanctuaries",
+      "url": "/showroom",
+      "description": "Visit Bengaluru & Mumbai showrooms"
+    },
+    {
+      "name": "Design Consultation",
+      "url": "/consultation",
+      "description": "Book personalized interior consultation"
+    }
+  ]
+}
