@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useMemo, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { SlidersHorizontal, ChevronRight, X, ArrowUpDown } from 'lucide-react';
-import { PRODUCTS } from '@/data/products';
-import { FilterState } from '@/types';
+import { SlidersHorizontal, ChevronRight, X, ArrowUpDown, Loader2 } from 'lucide-react';
+import { Product, FilterState, ProductFiltersMeta } from '@/types';
+import { fetchProducts, fetchProductFilters } from '@/services/api';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { FilterSidebar } from '@/components/ui/FilterSidebar';
 
@@ -30,6 +30,38 @@ function ShopContent() {
     sortBy: initialFilter === 'new' ? 'newest' : initialFilter === 'best-seller' ? 'rating' : 'featured'
   });
 
+  const [products, setProducts] = useState<Product[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [filterMeta, setFilterMeta] = useState<ProductFiltersMeta | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Fetch filter metadata on initial load
+  useEffect(() => {
+    fetchProductFilters().then((meta) => {
+      setFilterMeta(meta);
+    });
+  }, []);
+
+  // Fetch filtered products when filters change
+  useEffect(() => {
+    let isCancelled = false;
+    setIsLoading(true);
+    fetchProducts(filters)
+      .then((res) => {
+        if (!isCancelled) {
+          setProducts(res.data);
+          setTotalCount(res.total);
+          setIsLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!isCancelled) setIsLoading(false);
+      });
+    return () => {
+      isCancelled = true;
+    };
+  }, [filters]);
+
   const handleFilterChange = (updated: Partial<FilterState>) => {
     setFilters((prev) => ({ ...prev, ...updated }));
   };
@@ -39,8 +71,8 @@ function ShopContent() {
       search: '',
       category: '',
       room: '',
-      minPrice: 15000,
-      maxPrice: 250000,
+      minPrice: filterMeta?.minPrice ?? 15000,
+      maxPrice: filterMeta?.maxPrice ?? 250000,
       materials: [],
       colors: [],
       sizes: [],
@@ -49,71 +81,6 @@ function ShopContent() {
       sortBy: 'featured'
     });
   };
-
-  // Filtered and Sorted Products computation
-  const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((product) => {
-      // Category filter
-      if (filters.category && product.category !== filters.category) {
-        return false;
-      }
-
-      // Room filter
-      if (filters.room && product.room !== filters.room) {
-        return false;
-      }
-
-      // Price filter
-      if (product.price > filters.maxPrice) {
-        return false;
-      }
-
-      // Materials filter
-      if (filters.materials.length > 0) {
-        const matchesMaterial = filters.materials.some((m) =>
-          product.materials.some((pm) => pm.toLowerCase().includes(m.toLowerCase()))
-        );
-        if (!matchesMaterial) return false;
-      }
-
-      // Colors filter
-      if (filters.colors.length > 0) {
-        const matchesColor = filters.colors.some((colName) => {
-          const keyword = colName.split('/')[0].trim().toLowerCase();
-          return product.colors.some((c) => c.name.toLowerCase().includes(keyword));
-        });
-        if (!matchesColor) return false;
-      }
-
-      // Availability filter
-      if (filters.availability === 'in-stock' && !product.inStock) {
-        return false;
-      }
-      if (
-        filters.availability === 'made-to-order' &&
-        !product.badges?.includes('Crafted to Order')
-      ) {
-        return false;
-      }
-
-      // Rating filter
-      if (filters.rating > 0 && product.rating < filters.rating) {
-        return false;
-      }
-
-      return true;
-    }).sort((a, b) => {
-      if (filters.sortBy === 'price-low') return a.price - b.price;
-      if (filters.sortBy === 'price-high') return b.price - a.price;
-      if (filters.sortBy === 'rating') return b.rating - a.rating;
-      if (filters.sortBy === 'newest') {
-        const aNew = a.badges?.includes('New') ? 1 : 0;
-        const bNew = b.badges?.includes('New') ? 1 : 0;
-        return bNew - aNew;
-      }
-      return 0; // featured default
-    });
-  }, [filters]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
@@ -188,7 +155,8 @@ function ShopContent() {
             filters={filters}
             onFilterChange={handleFilterChange}
             onReset={handleResetFilters}
-            productCount={filteredProducts.length}
+            productCount={totalCount}
+            filterMeta={filterMeta}
           />
         </div>
 
@@ -251,9 +219,14 @@ function ShopContent() {
           )}
 
           {/* Product Grid */}
-          {filteredProducts.length > 0 ? (
+          {isLoading ? (
+            <div className="py-24 flex flex-col items-center justify-center gap-3 text-neutral-400">
+              <Loader2 className="w-6 h-6 animate-spin text-[#8b633b]" />
+              <span className="text-xs uppercase tracking-widest font-mono">Loading Catalogue...</span>
+            </div>
+          ) : products.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-              {filteredProducts.map((prod) => (
+              {products.map((prod) => (
                 <ProductCard key={prod.id} product={prod} />
               ))}
             </div>
@@ -305,7 +278,8 @@ function ShopContent() {
                 filters={filters}
                 onFilterChange={handleFilterChange}
                 onReset={handleResetFilters}
-                productCount={filteredProducts.length}
+                productCount={totalCount}
+                filterMeta={filterMeta}
               />
             </div>
 
@@ -322,7 +296,7 @@ function ShopContent() {
                 onClick={() => setIsMobileFilterOpen(false)}
                 className="w-2/3 bg-[#2C241E] hover:bg-[#1C1917] text-white text-xs font-semibold py-3 rounded-xl transition"
               >
-                Show {filteredProducts.length} Results
+                Show {totalCount} Results
               </button>
             </div>
           </div>

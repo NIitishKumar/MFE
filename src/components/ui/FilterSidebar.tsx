@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { FilterState } from '@/types';
+import { FilterState, ProductFiltersMeta } from '@/types';
 import { CATEGORIES } from '@/data/categories';
 import { Star, Check, RotateCcw } from 'lucide-react';
 
@@ -10,6 +10,7 @@ interface FilterSidebarProps {
   onFilterChange: (updated: Partial<FilterState>) => void;
   onReset: () => void;
   productCount: number;
+  filterMeta?: ProductFiltersMeta | null;
 }
 
 export const MATERIALS_LIST = [
@@ -37,8 +38,15 @@ export function FilterSidebar({
   filters,
   onFilterChange,
   onReset,
-  productCount
+  productCount,
+  filterMeta
 }: FilterSidebarProps) {
+  const minBound = filterMeta?.minPrice ?? 14000;
+  const maxBound = filterMeta?.maxPrice ?? 250000;
+  const materialsList = filterMeta?.materials && filterMeta.materials.length > 0
+    ? filterMeta.materials
+    : MATERIALS_LIST;
+
   const handleMaterialToggle = (material: string) => {
     const next = filters.materials.includes(material)
       ? filters.materials.filter((m) => m !== material)
@@ -118,16 +126,16 @@ export function FilterSidebar({
         </div>
         <input
           type="range"
-          min={15000}
-          max={250000}
+          min={minBound}
+          max={maxBound}
           step={5000}
           value={filters.maxPrice}
           onChange={(e) => onFilterChange({ maxPrice: Number(e.target.value) })}
           className="w-full accent-[#443224] bg-[#E8DFD3] h-1.5 rounded-lg cursor-pointer"
         />
         <div className="flex items-center justify-between text-[11px] text-[#8C827A]">
-          <span>₹15,000</span>
-          <span>₹2,50,000+</span>
+          <span>₹{minBound.toLocaleString('en-IN')}</span>
+          <span>₹{maxBound.toLocaleString('en-IN')}+</span>
         </div>
       </div>
 
@@ -137,7 +145,7 @@ export function FilterSidebar({
           Materials
         </h3>
         <div className="flex flex-wrap gap-1.5">
-          {MATERIALS_LIST.map((mat) => {
+          {materialsList.map((mat) => {
             const isSelected = filters.materials.includes(mat);
             return (
               <button

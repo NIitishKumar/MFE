@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Search, X, ArrowRight, History, Sparkles, TrendingUp } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
+import { Product } from '@/types';
 import { PRODUCTS } from '@/data/products';
+import { fetchProducts } from '@/services/api';
 
 export function SearchOverlay() {
   const router = useRouter();
@@ -21,6 +23,7 @@ export function SearchOverlay() {
   } = useStore();
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const [liveResults, setLiveResults] = useState<Product[]>([]);
 
   useEffect(() => {
     if (isSearchOpen) {
@@ -32,6 +35,28 @@ export function SearchOverlay() {
     return () => document.body.classList.remove('modal-open');
   }, [isSearchOpen]);
 
+  useEffect(() => {
+    let active = true;
+    const q = searchQuery.trim();
+    if (!q) {
+      setLiveResults([]);
+      return;
+    }
+    const timer = setTimeout(() => {
+      fetchProducts({ search: q, limit: 5 })
+        .then((res) => {
+          if (active) setLiveResults(res.data);
+        })
+        .catch(() => {
+          if (active) setLiveResults([]);
+        });
+    }, 150);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [searchQuery]);
+
   if (!isSearchOpen) return null;
 
   const popularSearches = [
@@ -42,18 +67,6 @@ export function SearchOverlay() {
     'Marble monolith',
     'Reeded credenza'
   ];
-
-  const filteredProducts = searchQuery.trim()
-    ? PRODUCTS.filter((p) => {
-        const q = searchQuery.toLowerCase();
-        return (
-          p.name.toLowerCase().includes(q) ||
-          p.categoryLabel.toLowerCase().includes(q) ||
-          p.roomLabel.toLowerCase().includes(q) ||
-          p.materials.some((m) => m.toLowerCase().includes(q))
-        );
-      }).slice(0, 5)
-    : [];
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,9 +134,9 @@ export function SearchOverlay() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs uppercase tracking-wider font-semibold text-[#8C827A]">
-                  Suggested Products ({filteredProducts.length})
+                  Suggested Products ({liveResults.length})
                 </h3>
-                {filteredProducts.length > 0 && (
+                {liveResults.length > 0 && (
                   <button
                     type="button"
                     onClick={handleSearchSubmit}
@@ -135,9 +148,9 @@ export function SearchOverlay() {
                 )}
               </div>
 
-              {filteredProducts.length > 0 ? (
+              {liveResults.length > 0 ? (
                 <div className="divide-y divide-[#F0E9DE]">
-                  {filteredProducts.map((product) => (
+                  {liveResults.map((product) => (
                     <Link
                       key={product.id}
                       href={`/product/${product.id}`}
@@ -154,7 +167,7 @@ export function SearchOverlay() {
                       />
                       <div className="flex-1 min-w-0">
                         <span className="text-[10px] uppercase tracking-wider text-[#A39B8F] font-semibold">
-                          {product.categoryLabel}
+                          {product.categoryLabel || product.category}
                         </span>
                         <h4 className="font-serif text-sm sm:text-base font-medium text-[#1C1917] group-hover:text-[#443224] truncate">
                           {product.name}

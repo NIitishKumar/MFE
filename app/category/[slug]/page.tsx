@@ -2,8 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChevronRight, Sparkles } from 'lucide-react';
-import { CATEGORIES } from '@/data/categories';
-import { PRODUCTS } from '@/data/products';
+import { fetchCategoryBySlug, fetchProducts } from '@/services/api';
 import { ProductCard } from '@/components/ui/ProductCard';
 
 interface CategoryPageProps {
@@ -12,13 +11,14 @@ interface CategoryPageProps {
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
-  const category = CATEGORIES.find((c) => c.slug === slug);
+  const [category, { data: categoryProducts }] = await Promise.all([
+    fetchCategoryBySlug(slug),
+    fetchProducts({ category: slug }),
+  ]);
 
   if (!category) {
     notFound();
   }
-
-  const categoryProducts = PRODUCTS.filter((p) => p.category === slug);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">

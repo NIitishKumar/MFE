@@ -2,8 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChevronRight, Sparkles } from 'lucide-react';
-import { COLLECTIONS } from '@/data/collections';
-import { PRODUCTS } from '@/data/products';
+import { fetchCollectionBySlug, fetchProducts } from '@/services/api';
 import { ProductCard } from '@/components/ui/ProductCard';
 
 interface CollectionPageProps {
@@ -12,13 +11,14 @@ interface CollectionPageProps {
 
 export default async function CollectionDetailPage({ params }: CollectionPageProps) {
   const { slug } = await params;
-  const collection = COLLECTIONS.find((c) => c.slug === slug);
+  const [collection, { data: collectionProducts }] = await Promise.all([
+    fetchCollectionBySlug(slug),
+    fetchProducts({ collectionSlug: slug }),
+  ]);
 
   if (!collection) {
     notFound();
   }
-
-  const collectionProducts = PRODUCTS.filter((p) => p.collectionSlug === slug);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-12">

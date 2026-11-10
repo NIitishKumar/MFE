@@ -1,15 +1,23 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Sparkles, MapPin, Star, ShieldCheck, HeartHandshake, Compass, CheckCircle2 } from 'lucide-react';
-import { PRODUCTS } from '@/data/products';
-import { CATEGORIES, ROOMS } from '@/data/categories';
+import {
+  fetchFeaturedProducts,
+  fetchCategories,
+  fetchCollections,
+  fetchRooms,
+} from '@/services/api';
 import { ProductCard } from '@/components/ui/ProductCard';
 
-export default function HomePage() {
-  const newArrivals = PRODUCTS.filter((p) => p.badges?.includes('New')).slice(0, 4);
-  const bestSellers = PRODUCTS.filter((p) => p.badges?.includes('Best Seller')).slice(0, 4);
+export default async function HomePage() {
+  const [featured, categories, collections, rooms] = await Promise.all([
+    fetchFeaturedProducts(),
+    fetchCategories(),
+    fetchCollections(),
+    fetchRooms(),
+  ]);
+
+  const { newArrivals, bestSellers } = featured;
 
   const testimonials = [
     {
@@ -130,7 +138,7 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {CATEGORIES.map((cat, idx) => (
+          {categories.map((cat, idx) => (
             <Link
               key={cat.id}
               href={`/category/${cat.slug}`}
@@ -265,6 +273,61 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 5.5 CURATED DESIGN COLLECTIONS */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8">
+          <div>
+            <span className="text-xs uppercase tracking-[0.2em] font-semibold text-[#8C827A]">
+              Design Studies
+            </span>
+            <h2 className="font-serif text-2xl sm:text-4xl text-[#1C1917] font-normal mt-1">
+              Curated Collections
+            </h2>
+            <p className="text-xs text-[#78716C] mt-1">
+              Holistic interior narratives sculpted around singular architectural materials and moods.
+            </p>
+          </div>
+          <Link
+            href="/collections"
+            className="text-xs uppercase tracking-wider font-semibold text-[#443224] hover:text-[#1C1917] flex items-center gap-1 mt-2 sm:mt-0 transition group"
+          >
+            <span>View All Collections</span>
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {collections.slice(0, 4).map((col) => (
+            <Link
+              key={col.id}
+              href={`/collections/${col.slug}`}
+              className="group relative rounded-2xl overflow-hidden aspect-4/5 bg-[#2C241E] border border-[#3E332A] transition-all duration-300 hover:shadow-xl"
+            >
+              <img
+                src={col.heroImage}
+                alt={col.name}
+                loading="lazy"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 brightness-[0.8]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+                <span className="text-[10px] uppercase font-mono tracking-widest text-[#D4AF37] block mb-1">
+                  {col.productsCount} Pieces
+                </span>
+                <h3 className="font-serif text-xl font-medium">{col.name}</h3>
+                <p className="text-xs text-[#DDD3C5] mt-1 line-clamp-1 italic font-light">
+                  &ldquo;{col.tagline}&rdquo;
+                </p>
+                <div className="mt-3 flex items-center gap-1.5 text-xs text-[#D4AF37] font-semibold group-hover:translate-x-1 transition">
+                  <span>Explore Collection</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* 6. SHOP BY ROOM */}
       <section className="bg-[#F5F0E6] py-16 sm:py-20 border-y border-[#E8DFD3]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -281,7 +344,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {ROOMS.map((room) => (
+            {rooms.map((room) => (
               <Link
                 key={room.id}
                 href={`/shop?room=${room.slug}`}

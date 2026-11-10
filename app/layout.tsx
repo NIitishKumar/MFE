@@ -2,14 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import { Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { StoreProvider } from '@/context/StoreContext';
-import { AnnouncementBar } from '@/components/ui/AnnouncementBar';
-import { Navbar } from '@/components/ui/Navbar';
-import { Footer } from '@/components/ui/Footer';
-import { MobileBottomNav } from '@/components/ui/MobileBottomNav';
-import { CartDrawer } from '@/components/ui/CartDrawer';
-import { SearchOverlay } from '@/components/ui/SearchOverlay';
-import { ToastContainer } from '@/components/ui/ToastContainer';
-import { PWAInstallBanner } from '@/components/ui/PWAInstallBanner';
+import { StorefrontChrome } from '@/components/ui/StorefrontChrome';
+import WhatsAppButton from '@/components/ui/WhatsAppButton';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -64,15 +58,8 @@ export default function RootLayout({
     <html lang="en" className={`${playfair.variable} ${plusJakarta.variable}`}>
       <body className="bg-[#FDFBF7] text-[#1C1917] flex flex-col min-h-screen">
         <StoreProvider>
-          <AnnouncementBar />
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <MobileBottomNav />
-          <CartDrawer />
-          <SearchOverlay />
-          <ToastContainer />
-          <PWAInstallBanner />
+          <StorefrontChrome>{children}</StorefrontChrome>
+          <WhatsAppButton />
         </StoreProvider>
       </body>
     </html>

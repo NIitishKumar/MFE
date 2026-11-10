@@ -5,21 +5,23 @@ export interface ProductColor {
 }
 
 export interface ProductDimensions {
-  width: string;   // e.g. "220 cm"
-  depth: string;   // e.g. "95 cm"
-  height: string;  // e.g. "78 cm"
-  seatHeight?: string; // e.g. "42 cm"
-  weight?: string; // e.g. "65 kg"
+  width: string;   // e.g. "260 cm"
+  depth: string;   // e.g. "115 cm"
+  height: string;  // e.g. "76 cm"
+  seatHeight?: string; // e.g. "43 cm"
+  weight?: string; // e.g. "78 kg"
 }
+
+export type ProductBadge = 'New' | 'Best Seller' | '20% Off' | 'Crafted to Order';
 
 export interface Product {
   id: string;
   name: string;
   slug: string;
-  category: 'sofas' | 'beds' | 'dining' | 'chairs' | 'tables' | 'storage' | 'decor';
-  categoryLabel: string;
-  room: 'living-room' | 'bedroom' | 'dining-room' | 'home-office' | 'outdoor';
-  roomLabel: string;
+  category: 'sofas' | 'beds' | 'dining' | 'chairs' | 'tables' | 'storage' | 'decor' | string;
+  categoryLabel?: string;
+  room: 'living-room' | 'bedroom' | 'dining-room' | 'home-office' | 'outdoor' | string;
+  roomLabel?: string;
   price: number;
   originalPrice?: number;
   discountPercentage?: number;
@@ -31,15 +33,17 @@ export interface Product {
   dimensions: ProductDimensions;
   colors: ProductColor[];
   sizes: string[];
-  badges?: ('New' | 'Best Seller' | '20% Off' | 'Crafted to Order')[];
+  badges?: ProductBadge[];
   inStock: boolean;
   images: string[];
   lifestyleImages?: string[];
-  careInstructions: string;
-  warranty: string;
-  leadTime: string;
+  careInstructions?: string;
+  warranty?: string;
+  leadTime?: string;
   collectionSlug?: string;
   collectionName?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Category {
@@ -61,6 +65,24 @@ export interface Collection {
   heroImage: string;
   secondaryImage: string;
   productsCount: number;
+}
+
+export interface Room {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+}
+
+export interface ProductFiltersMeta {
+  categories: string[];
+  rooms: string[];
+  materials: string[];
+  colors: string[];
+  minPrice: number;
+  maxPrice: number;
+  totalProducts: number;
 }
 
 export interface CartItem {
@@ -143,12 +165,14 @@ export interface FilterState {
   search: string;
   category: string;
   room: string;
+  collectionSlug?: string;
   minPrice: number;
   maxPrice: number;
   materials: string[];
   colors: string[];
   sizes: string[];
   availability: 'all' | 'in-stock' | 'made-to-order';
+  badge?: string;
   rating: number; // 0 means all
   sortBy: 'featured' | 'price-low' | 'price-high' | 'rating' | 'newest';
 }

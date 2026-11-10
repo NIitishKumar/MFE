@@ -1,29 +1,36 @@
 'use client';
 
-import React, { Suspense, useMemo } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Search, ChevronRight, SlidersHorizontal } from 'lucide-react';
-import { PRODUCTS } from '@/data/products';
+import { Search, ChevronRight, SlidersHorizontal, Loader2 } from 'lucide-react';
+import { Product } from '@/types';
+import { fetchProducts } from '@/services/api';
 import { ProductCard } from '@/components/ui/ProductCard';
 
 function SearchResultsContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
+  const [results, setResults] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const results = useMemo(() => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase().trim();
-    return PRODUCTS.filter((p) => {
-      return (
-        p.name.toLowerCase().includes(q) ||
-        p.categoryLabel.toLowerCase().includes(q) ||
-        p.roomLabel.toLowerCase().includes(q) ||
-        p.materials.some((m) => m.toLowerCase().includes(q)) ||
-        p.colors.some((c) => c.name.toLowerCase().includes(q)) ||
-        p.shortDescription.toLowerCase().includes(q)
-      );
-    });
+  useEffect(() => {
+    let active = true;
+    setIsLoading(true);
+    fetchProducts({ search: query.trim() || undefined })
+      .then((res) => {
+        if (active) {
+          setResults(res.data);
+          setIsLoading(false);
+        }
+      })
+      .catch(() => {
+        if (active) setIsLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [query]);
 
   return (
@@ -56,12 +63,19 @@ function SearchResultsContent() {
           )}
         </h1>
         <p className="text-xs sm:text-sm text-[#78716C] mt-1">
-          Showing {results.length} heirloom pieces matching your query
+          {isLoading
+            ? 'Querying architectural catalog...'
+            : `Showing ${results.length} heirloom pieces matching your query`}
         </p>
       </div>
 
       {/* Results Grid */}
-      {results.length > 0 ? (
+      {isLoading ? (
+        <div className="py-24 flex flex-col items-center justify-center gap-3 text-neutral-400">
+          <Loader2 className="w-6 h-6 animate-spin text-[#8b633b]" />
+          <span className="text-xs uppercase tracking-widest font-mono">Searching pieces...</span>
+        </div>
+      ) : results.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {results.map((product) => (
             <ProductCard key={product.id} product={product} />
