@@ -1,0 +1,17 @@
+import React from 'react';
+import type { Metadata } from 'next';
+import { buildNoIndexMetadata } from '@/lib/seo';
+
+export const metadata: Metadata = buildNoIndexMetadata(
+  'Reset Password',
+  'Reset your Madhav Furnitures account password.',
+);
+
+export default function ForgotPasswordLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return children;
+}
+

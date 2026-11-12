@@ -1,10 +1,26 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo';
+
+export const metadata: Metadata = buildPageMetadata({
+  title: 'Terms & Conditions',
+  description:
+    'Review the Terms and Conditions for Madhav Furnitures including natural wood and stone material variances, White-Glove installation, and 10–15 year structural warranty.',
+  path: '/terms',
+});
 
 export default function TermsPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16 space-y-8 text-xs sm:text-sm text-[#57534E] leading-relaxed">
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: 'Home', path: '/' },
+          { name: 'Terms & Conditions', path: '/terms' },
+        ])}
+      />
       <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-[#8C827A]">
         <Link href="/" className="hover:text-[#1C1917] transition">Home</Link>
         <ChevronRight className="w-3.5 h-3.5 text-[#C4B7AA]" />

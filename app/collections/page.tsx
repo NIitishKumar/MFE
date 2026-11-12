@@ -1,15 +1,55 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Sparkles, ChevronRight } from 'lucide-react';
 import { fetchCollections } from '@/services/api';
 import { ApiFallbackState } from '@/components/ui/ApiFallbackState';
+import { JsonLd } from '@/components/seo/JsonLd';
+import {
+  SITE_NAME,
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildPageMetadata,
+} from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = buildPageMetadata({
+  title: 'Curated Furniture Collections',
+  description:
+    'Explore curated architectural furniture design narratives crafted in Italian Roman Travertine, American Walnut, Solid Oak, and Belgian Bouclé by Madhav Furnitures.',
+  path: '/collections',
+  keywords: [
+    'curated furniture collections',
+    'luxury interior collections India',
+    'architectural furniture studies',
+    SITE_NAME,
+  ],
+});
 
 export default async function CollectionsPage() {
   const collections = await fetchCollections();
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-12">
+      <JsonLd
+        data={[
+          buildBreadcrumbJsonLd([
+            { name: 'Home', path: '/' },
+            { name: 'Collections', path: '/collections' },
+          ]),
+          buildCollectionPageJsonLd({
+            name: 'Madhav Furnitures Curated Collections',
+            description:
+              'Curated architectural furniture design narratives across dining, living, and bedroom spaces.',
+            path: '/collections',
+            items: collections.map((col) => ({
+              name: col.name,
+              path: `/collections/${col.slug}`,
+              image: col.heroImage,
+            })),
+          }),
+        ]}
+      />
       {/* Breadcrumbs */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-[#8C827A]">
         <Link href="/" className="hover:text-[#1C1917] transition">

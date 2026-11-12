@@ -1,20 +1,76 @@
-import React from 'react';
+import React, { cache } from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ChevronRight, Sparkles } from 'lucide-react';
 import { fetchCategoryBySlug, fetchProducts } from '@/services/api';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { ApiFallbackState } from '@/components/ui/ApiFallbackState';
+import { JsonLd } from '@/components/seo/JsonLd';
+import {
+  SITE_NAME,
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildNoIndexMetadata,
+  buildPageMetadata,
+} from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
+
+const getCachedCategory = cache(async (slug: string) =>
+  fetchCategoryBySlug(slug).catch(() => null),
+);
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
 }
 
+export async function generateMetadata({
+  params,
+}: CategoryPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const category = await getCachedCategory(slug);
+
+  if (!category) {
+    return buildNoIndexMetadata(
+      'Category Unavailable',
+      'This furniture category is currently unavailable in the Madhav Furnitures catalog.',
+      true,
+    );
+  }
+
+  return buildPageMetadata({
+    title: `${category.name} — Handcrafted Luxury ${category.name}`,
+    description:
+      category.description ||
+      `Explore handcrafted ${category.name.toLowerCase()} by ${SITE_NAME} crafted in solid wood, Italian stone, and bespoke upholstery across India.`,
+    path: `/category/${category.slug || slug}`,
+    keywords: [
+      `${category.name} India`,
+      `luxury ${category.name.toLowerCase()}`,
+      `solid wood ${category.name.toLowerCase()}`,
+      `designer ${category.name.toLowerCase()}`,
+      category.room ? `${category.room.replace(/-/g, ' ')} furniture` : '',
+      SITE_NAME,
+    ].filter(Boolean),
+    ...(category.image
+      ? {
+          images: [
+            {
+              url: category.image,
+              width: 1200,
+              height: 800,
+              alt: `${category.name} — ${SITE_NAME}`,
+            },
+          ],
+        }
+      : {}),
+  });
+}
+
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
   const [category, { data: categoryProducts }] = await Promise.all([
-    fetchCategoryBySlug(slug),
+    getCachedCategory(slug),
     fetchProducts({ category: slug }),
   ]);
 
@@ -34,6 +90,25 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
+      <JsonLd
+        data={[
+          buildBreadcrumbJsonLd([
+            { name: 'Home', path: '/' },
+            { name: 'Shop', path: '/shop' },
+            { name: category.name, path: `/category/${category.slug || slug}` },
+          ]),
+          buildCollectionPageJsonLd({
+            name: `${category.name} Collection`,
+            description: category.description,
+            path: `/category/${category.slug || slug}`,
+            items: categoryProducts.map((p) => ({
+              name: p.name,
+              path: `/product/${p.slug || p.id}`,
+              image: p.images?.[0],
+            })),
+          }),
+        ]}
+      />
       {/* Breadcrumbs */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-[#8C827A]">
         <Link href="/" className="hover:text-[#1C1917] transition">

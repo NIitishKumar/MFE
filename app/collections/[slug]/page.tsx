@@ -1,20 +1,75 @@
-import React from 'react';
+import React, { cache } from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ChevronRight, Sparkles } from 'lucide-react';
 import { fetchCollectionBySlug, fetchProducts } from '@/services/api';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { ApiFallbackState } from '@/components/ui/ApiFallbackState';
+import { JsonLd } from '@/components/seo/JsonLd';
+import {
+  SITE_NAME,
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildNoIndexMetadata,
+  buildPageMetadata,
+} from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
+
+const getCachedCollection = cache(async (slug: string) =>
+  fetchCollectionBySlug(slug).catch(() => null),
+);
 
 interface CollectionPageProps {
   params: Promise<{ slug: string }>;
 }
 
+export async function generateMetadata({
+  params,
+}: CollectionPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const collection = await getCachedCollection(slug);
+
+  if (!collection) {
+    return buildNoIndexMetadata(
+      'Collection Unavailable',
+      'This curated design collection is currently unavailable.',
+      true,
+    );
+  }
+
+  return buildPageMetadata({
+    title: `${collection.name} Collection`,
+    description:
+      collection.description ||
+      `${collection.tagline} Explore curated architectural furniture in the ${collection.name} collection by ${SITE_NAME}.`,
+    path: `/collections/${collection.slug || slug}`,
+    keywords: [
+      collection.name,
+      `${collection.name} furniture collection`,
+      'curated furniture collections India',
+      'luxury architectural furniture',
+      SITE_NAME,
+    ],
+    ...(collection.heroImage
+      ? {
+          images: [
+            {
+              url: collection.heroImage,
+              width: 1200,
+              height: 800,
+              alt: `${collection.name} — ${SITE_NAME}`,
+            },
+          ],
+        }
+      : {}),
+  });
+}
+
 export default async function CollectionDetailPage({ params }: CollectionPageProps) {
   const { slug } = await params;
   const [collection, { data: collectionProducts }] = await Promise.all([
-    fetchCollectionBySlug(slug),
+    getCachedCollection(slug),
     fetchProducts({ collectionSlug: slug }),
   ]);
 
@@ -34,6 +89,25 @@ export default async function CollectionDetailPage({ params }: CollectionPagePro
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-12">
+      <JsonLd
+        data={[
+          buildBreadcrumbJsonLd([
+            { name: 'Home', path: '/' },
+            { name: 'Collections', path: '/collections' },
+            { name: collection.name, path: `/collections/${collection.slug || slug}` },
+          ]),
+          buildCollectionPageJsonLd({
+            name: collection.name,
+            description: collection.description,
+            path: `/collections/${collection.slug || slug}`,
+            items: collectionProducts.map((p) => ({
+              name: p.name,
+              path: `/product/${p.slug || p.id}`,
+              image: p.images?.[0],
+            })),
+          }),
+        ]}
+      />
       {/* Breadcrumbs */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-[#8C827A]">
         <Link href="/" className="hover:text-[#1C1917] transition">

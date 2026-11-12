@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Sparkles, MapPin, Star, ShieldCheck, HeartHandshake, Compass, CheckCircle2 } from 'lucide-react';
 import {
@@ -11,8 +12,43 @@ import {
 import { FeaturedCategories } from '@/features/featured-categories';
 import { NewArrivals } from '@/features/new-arrivals';
 import { BestSellers } from '@/features/best-sellers';
+import { JsonLd } from '@/components/seo/JsonLd';
+import {
+  DEFAULT_DESCRIPTION,
+  DEFAULT_KEYWORDS,
+  DEFAULT_OG_IMAGE_PATH,
+  DEFAULT_TITLE,
+  buildCollectionPageJsonLd,
+  getSiteUrl,
+} from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: {
+    absolute: DEFAULT_TITLE,
+  },
+  description: DEFAULT_DESCRIPTION,
+  keywords: DEFAULT_KEYWORDS,
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_IN',
+    url: getSiteUrl(),
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: [
+      {
+        url: DEFAULT_OG_IMAGE_PATH,
+        width: 1200,
+        height: 630,
+        alt: DEFAULT_TITLE,
+      },
+    ],
+  },
+};
 
 export default async function HomePage() {
   const [newArrivalsData, bestSellersData, categories, collections, rooms] = await Promise.all([
@@ -53,8 +89,25 @@ export default async function HomePage() {
     }
   ];
 
+  const featuredProducts = [
+    ...(newArrivalsData.data || []),
+    ...(bestSellersData.data || []),
+  ];
+
   return (
     <div className="flex flex-col space-y-16 sm:space-y-24 pb-16 overflow-hidden">
+      <JsonLd
+        data={buildCollectionPageJsonLd({
+          name: DEFAULT_TITLE,
+          description: DEFAULT_DESCRIPTION,
+          path: '/',
+          items: featuredProducts.map((product) => ({
+            name: product.name,
+            path: `/product/${product.slug || product.id}`,
+            image: product.images?.[0],
+          })),
+        })}
+      />
       {/* 1. HERO SECTION */}
       <section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-center bg-[#F5F0E6] overflow-hidden">
         {/* Background Editorial Image */}

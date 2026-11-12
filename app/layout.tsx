@@ -4,6 +4,18 @@ import './globals.css';
 import { StoreProvider } from '@/context/StoreContext';
 import { StorefrontChrome } from '@/components/ui/StorefrontChrome';
 import WhatsAppButton from '@/components/ui/WhatsAppButton';
+import { JsonLd } from '@/components/seo/JsonLd';
+import {
+  DEFAULT_DESCRIPTION,
+  DEFAULT_KEYWORDS,
+  DEFAULT_OG_IMAGE_PATH,
+  DEFAULT_TITLE,
+  SITE_LEGAL_NAME,
+  SITE_NAME,
+  buildOrganizationJsonLd,
+  buildWebSiteJsonLd,
+  getSiteUrl,
+} from '@/lib/seo';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -17,10 +29,66 @@ const plusJakarta = Plus_Jakarta_Sans({
   display: 'swap',
 });
 
+const googleVerificationToken = (
+  process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || ''
+).trim();
+
 export const metadata: Metadata = {
-  title: 'MADHAV FURNITURES — Premium Furniture Showroom & Studio',
-  description:
-    'Thoughtfully designed architectural furniture crafted for modern living. Explore hand-honed travertine dining tables, curved bouclé sofas, solid oak beds, and schedule appointments at our Bengaluru & Mumbai showrooms.',
+  metadataBase: new URL(getSiteUrl()),
+  title: {
+    default: DEFAULT_TITLE,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: DEFAULT_DESCRIPTION,
+  applicationName: SITE_NAME,
+  category: 'Furniture & Home Decor',
+  authors: [{ name: SITE_LEGAL_NAME, url: getSiteUrl() }],
+  creator: SITE_NAME,
+  publisher: SITE_LEGAL_NAME,
+  alternates: {
+    canonical: '/',
+  },
+  keywords: DEFAULT_KEYWORDS,
+  openGraph: {
+    type: 'website',
+    locale: 'en_IN',
+    url: '/',
+    siteName: SITE_NAME,
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: [
+      {
+        url: DEFAULT_OG_IMAGE_PATH,
+        width: 1200,
+        height: 630,
+        alt: DEFAULT_TITLE,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE_PATH],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  ...(googleVerificationToken
+    ? {
+        verification: {
+          google: googleVerificationToken,
+        },
+      }
+    : {}),
   manifest: '/manifest.webmanifest',
   icons: {
     icon: [
@@ -37,15 +105,6 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
     title: 'Madhav Furnitures',
   },
-  keywords: [
-    'luxury furniture showroom',
-    'curved boucle sofa',
-    'travertine dining table',
-    'solid oak bed',
-    'bengaluru furniture showroom',
-    'mumbai furniture studio',
-    'interior consultation india'
-  ]
 };
 
 export const viewport: Viewport = {
@@ -63,6 +122,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${playfair.variable} ${plusJakarta.variable}`}>
       <body className="bg-[#FDFBF7] text-[#1C1917] flex flex-col min-h-screen">
+        <JsonLd data={[buildOrganizationJsonLd(), buildWebSiteJsonLd()]} />
         <StoreProvider>
           <StorefrontChrome>{children}</StorefrontChrome>
           <WhatsAppButton />

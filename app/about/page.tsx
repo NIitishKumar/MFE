@@ -1,10 +1,36 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Sparkles, ArrowRight, ShieldCheck, HeartHandshake, Leaf, Users } from 'lucide-react';
+import { JsonLd } from '@/components/seo/JsonLd';
+import {
+  SITE_NAME,
+  buildBreadcrumbJsonLd,
+  buildPageMetadata,
+} from '@/lib/seo';
+
+export const metadata: Metadata = buildPageMetadata({
+  title: 'About Us — Heritage, Craftsmanship & Architecture',
+  description:
+    'Discover the philosophy and artisan joinery behind Madhav Furnitures — solid timber furniture, sustainable forestry, natural stone craftsmanship, and bespoke design in India.',
+  path: '/about',
+  keywords: [
+    'Madhav Furnitures story',
+    'solid wood joinery India',
+    'handcrafted furniture atelier',
+    SITE_NAME,
+  ],
+});
 
 export default function AboutPage() {
   return (
     <div className="space-y-16 sm:space-y-24 pb-16">
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: 'Home', path: '/' },
+          { name: 'About Us', path: '/about' },
+        ])}
+      />
       {/* Hero */}
       <section className="relative min-h-[50vh] sm:min-h-[60vh] flex items-center bg-[#241E1A] text-white">
         <div className="absolute inset-0 z-0">
