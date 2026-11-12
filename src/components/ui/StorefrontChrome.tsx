@@ -6,7 +6,7 @@ import { AnnouncementBar } from '@/components/ui/AnnouncementBar';
 import { Navbar } from '@/components/ui/Navbar';
 import { Footer } from '@/components/ui/Footer';
 import { MobileBottomNav } from '@/components/ui/MobileBottomNav';
-import { CartDrawer } from '@/components/ui/CartDrawer';
+// import { CartDrawer } from '@/components/ui/CartDrawer';
 import { SearchOverlay } from '@/components/ui/SearchOverlay';
 import { ToastContainer } from '@/components/ui/ToastContainer';
 import { PWAInstallBanner } from '@/components/ui/PWAInstallBanner';
@@ -26,7 +26,7 @@ export function StorefrontChrome({ children }: { children: React.ReactNode }) {
       <main className="flex-1">{children}</main>
       <Footer />
       <MobileBottomNav />
-      <CartDrawer />
+      {/* <CartDrawer /> */}
       <SearchOverlay />
       <ToastContainer />
       <PWAInstallBanner />

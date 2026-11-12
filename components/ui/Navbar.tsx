@@ -7,7 +7,6 @@ import { usePathname } from 'next/navigation';
 import {
   Search,
   Heart,
-  ShoppingBag,
   User,
   Menu,
   X,
@@ -20,9 +19,7 @@ import { useStore } from '@/context/StoreContext';
 export function Navbar() {
   const pathname = usePathname();
   const {
-    cartCount,
     wishlistCount,
-    setIsCartOpen,
     setIsSearchOpen,
     user,
     categories,
@@ -226,7 +223,8 @@ export function Navbar() {
                 )}
               </Link>
 
-              <button
+              {/* Shopping Bag commented out for now */}
+              {/* <button
                 type="button"
                 onClick={() => setIsCartOpen(true)}
                 className="p-2 text-[#2C241E] hover:text-[#443224] rounded-full hover:bg-[#F2ECE1] transition relative"
@@ -238,7 +236,7 @@ export function Navbar() {
                     {cartCount}
                   </span>
                 )}
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

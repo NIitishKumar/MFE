@@ -2,11 +2,15 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Heart, ShoppingBag, Trash2, ChevronRight, ArrowRight } from 'lucide-react';
+import { Heart, Trash2, ChevronRight, ArrowRight } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
+import { buildProductWhatsAppUrl } from '@/lib/whatsapp';
+import { useClientOrigin } from '@/lib/useClientOrigin';
+import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon';
 
 export default function WishlistPage() {
-  const { wishlistProducts, removeFromCart, toggleWishlist, addToCart, formatINR } = useStore();
+  const { wishlistProducts, toggleWishlist, formatINR } = useStore();
+  const origin = useClientOrigin();
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
@@ -90,7 +94,8 @@ export default function WishlistPage() {
                 </div>
 
                 <div className="pt-3 border-t border-[#F5EFE6] flex gap-2">
-                  <button
+                  {/* Move to Cart commented out while bag option is hidden */}
+                  {/* <button
                     type="button"
                     onClick={() => {
                       addToCart(product, 1);
@@ -100,7 +105,16 @@ export default function WishlistPage() {
                   >
                     <ShoppingBag className="w-3.5 h-3.5" />
                     <span>Move to Cart</span>
-                  </button>
+                  </button> */}
+                  <a
+                    href={buildProductWhatsAppUrl({ product, origin })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-semibold py-2.5 px-3 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <WhatsAppIcon className="w-3.5 h-3.5" />
+                    <span>Inquire on WhatsApp</span>
+                  </a>
                   <Link
                     href={`/product/${product.id}`}
                     className="p-2.5 rounded-xl border border-[#D5C9B8] text-[#57534E] hover:bg-[#FAF7F2] text-xs font-medium flex items-center justify-center"

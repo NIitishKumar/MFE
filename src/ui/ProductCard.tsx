@@ -3,9 +3,12 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, ShoppingBag, Star, Eye } from 'lucide-react';
+import { Heart, Star, Eye } from 'lucide-react';
 import { Product } from '@/types';
 import { useStore } from '@/context/StoreContext';
+import { buildProductWhatsAppUrl } from '@/lib/whatsapp';
+import { useClientOrigin } from '@/lib/useClientOrigin';
+import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon';
 
 interface ProductCardProps {
   product: Product;
@@ -13,17 +16,17 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, priority = false }: ProductCardProps) {
-  const { isInWishlist, toggleWishlist, addToCart, formatINR } = useStore();
+  const { isInWishlist, toggleWishlist, formatINR } = useStore();
   const [isHovered, setIsHovered] = useState(false);
+  const origin = useClientOrigin();
 
   const isSaved = isInWishlist(product.id);
   const primaryImg = product.images[0];
   const secondaryImg = product.images[1] || product.images[0];
+  const whatsappUrl = buildProductWhatsAppUrl({ product, origin });
 
-  const handleQuickAdd = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleStopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
-    addToCart(product, 1);
   };
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
@@ -103,18 +106,29 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
 
         {/* Desktop Quick Actions Overlay */}
         <div
-          className={`hidden sm:flex absolute bottom-3 inset-x-3 gap-2 transition-all duration-300 ${
+          className={`hidden sm:flex absolute bottom-3 inset-x-3 z-10 gap-2 transition-all duration-300 ${
             isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
           }`}
         >
-          <button
+          {/* Quick Add commented out for now */}
+          {/* <button
             type="button"
             onClick={handleQuickAdd}
             className="flex-1 bg-[#2C241E]/95 hover:bg-[#1C1917] text-[#FDFBF7] text-xs font-medium py-2.5 px-3 rounded-xl backdrop-blur-xs flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer"
           >
             <ShoppingBag className="w-3.5 h-3.5" />
             <span>Quick Add</span>
-          </button>
+          </button> */}
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleStopPropagation}
+            className="flex-1 bg-[#25D366]/95 hover:bg-[#20BA5A] text-white text-xs font-medium py-2.5 px-3 rounded-xl backdrop-blur-xs flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer"
+          >
+            <WhatsAppIcon className="w-3.5 h-3.5" />
+            <span>WhatsApp</span>
+          </a>
           <Link
             href={`/product/${product.id}`}
             className="p-2.5 bg-white/90 hover:bg-white text-[#2C241E] rounded-xl backdrop-blur-xs transition shadow-sm flex items-center justify-center"
@@ -188,15 +202,25 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
             )}
           </div>
 
-          {/* Mobile direct Add button */}
-          <button
+          {/* Mobile Bag button commented out; replaced with WhatsApp inquiry */}
+          {/* <button
             type="button"
             onClick={handleQuickAdd}
             className="sm:hidden p-2 bg-[#F5F0E6] text-[#443224] hover:bg-[#2C241E] hover:text-white rounded-xl transition cursor-pointer"
             aria-label="Add to cart"
           >
             <ShoppingBag className="w-4 h-4" />
-          </button>
+          </button> */}
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleStopPropagation}
+            className="sm:hidden p-2 bg-[#25D366] text-white hover:bg-[#20BA5A] rounded-xl transition cursor-pointer inline-flex items-center justify-center"
+            aria-label={`Inquire about ${product.name} on WhatsApp`}
+          >
+            <WhatsAppIcon className="w-4 h-4" />
+          </a>
         </div>
       </div>
     </div>

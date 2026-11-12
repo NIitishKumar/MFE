@@ -3,28 +3,36 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Compass, Heart, ShoppingBag, User } from 'lucide-react';
+import { Home, Compass, Heart, User } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const { cartCount, wishlistCount, setIsCartOpen, user } = useStore();
+  const { wishlistCount, user } = useStore();
 
-  const navItems = [
+  const navItems: Array<{
+    label: string;
+    href: string;
+    icon: typeof Home;
+    active: boolean;
+    badge?: number;
+    onClick?: (e: React.MouseEvent) => void;
+  }> = [
     { label: 'Home', href: '/', icon: Home, active: pathname === '/' },
     { label: 'Shop', href: '/shop', icon: Compass, active: pathname.startsWith('/shop') || pathname.startsWith('/category') },
     { label: 'Wishlist', href: '/wishlist', icon: Heart, active: pathname === '/wishlist', badge: wishlistCount },
-    {
-      label: 'Cart',
-      href: '#',
-      icon: ShoppingBag,
-      active: false,
-      onClick: (e: React.MouseEvent) => {
-        e.preventDefault();
-        setIsCartOpen(true);
-      },
-      badge: cartCount
-    },
+    // Shopping Bag / Cart commented out for now
+    // {
+    //   label: 'Cart',
+    //   href: '#',
+    //   icon: ShoppingBag,
+    //   active: false,
+    //   onClick: (e: React.MouseEvent) => {
+    //     e.preventDefault();
+    //     setIsCartOpen(true);
+    //   },
+    //   badge: cartCount
+    // },
     { label: 'Account', href: user.isLoggedIn ? '/account' : '/login', icon: User, active: pathname.startsWith('/account') || pathname === '/login' }
   ];
 

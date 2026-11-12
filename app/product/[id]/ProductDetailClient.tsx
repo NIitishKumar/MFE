@@ -2,10 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import {
   Heart,
-  ShoppingBag,
   Star,
   Truck,
   ShieldCheck,
@@ -18,6 +16,9 @@ import { Product } from '@/types';
 import { useStore } from '@/context/StoreContext';
 import { ProductGallery } from '@/components/ui/ProductGallery';
 import { ProductCard } from '@/components/ui/ProductCard';
+import { buildProductWhatsAppUrl } from '@/lib/whatsapp';
+import { useClientOrigin } from '@/lib/useClientOrigin';
+import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon';
 
 interface ProductDetailClientProps {
   product: Product;
@@ -25,12 +26,13 @@ interface ProductDetailClientProps {
 }
 
 export function ProductDetailClient({ product, relatedProducts }: ProductDetailClientProps) {
-  const router = useRouter();
-  const { addToCart, isInWishlist, toggleWishlist, formatINR, setIsCartOpen } = useStore();
+  const { isInWishlist, toggleWishlist, formatINR } = useStore();
+  const origin = useClientOrigin();
 
   const [selectedColor, setSelectedColor] = useState(product.colors[0]?.name || '');
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || '');
   const [quantity, setQuantity] = useState(1);
+  const [customMessage, setCustomMessage] = useState('');
   const [activeTab, setActiveTab] = useState<'description' | 'materials' | 'dimensions' | 'delivery' | 'warranty'>('description');
 
   // PIN Code Delivery Estimate Checker
@@ -70,15 +72,25 @@ export function ProductDetailClient({ product, relatedProducts }: ProductDetailC
     }
   };
 
-  const handleAddToCart = () => {
-    addToCart(product, quantity, selectedColor, selectedSize);
-    setIsCartOpen(true);
-  };
+  // Bag / Checkout actions commented out for now in favor of WhatsApp product inquiry
+  // const handleAddToCart = () => {
+  //   addToCart(product, quantity, selectedColor, selectedSize);
+  //   setIsCartOpen(true);
+  // };
+  //
+  // const handleBuyNow = () => {
+  //   addToCart(product, quantity, selectedColor, selectedSize);
+  //   router.push('/checkout');
+  // };
 
-  const handleBuyNow = () => {
-    addToCart(product, quantity, selectedColor, selectedSize);
-    router.push('/checkout');
-  };
+  const whatsappUrl = buildProductWhatsAppUrl({
+    product,
+    quantity,
+    selectedColor,
+    selectedSize,
+    customMessage,
+    origin,
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-16">
@@ -260,8 +272,25 @@ export function ProductDetailClient({ product, relatedProducts }: ProductDetailC
             </div>
           )}
 
-          {/* Quantity & CTA Buttons */}
+          {/* Custom Message & CTA Buttons */}
           <div className="space-y-3 pt-4 border-t border-[#E8DFD3]">
+            <div className="space-y-1.5">
+              <label
+                htmlFor="whatsapp-custom-message"
+                className="block text-xs font-semibold text-[#1C1917]"
+              >
+                Custom Note / Inquiry Message <span className="font-normal text-[#8C827A]">(optional)</span>
+              </label>
+              <textarea
+                id="whatsapp-custom-message"
+                rows={2}
+                value={customMessage}
+                onChange={(e) => setCustomMessage(e.target.value)}
+                placeholder="e.g. Custom fabric finish, delivery city, or custom dimensions request..."
+                className="w-full bg-white border border-[#D5C9B8] focus:border-[#2C241E] rounded-xl px-3.5 py-2.5 text-xs text-[#1C1917] placeholder-[#A39B8F] focus:outline-hidden resize-none transition"
+              />
+            </div>
+
             <div className="flex items-center gap-3">
               {/* Quantity */}
               <div className="flex items-center border border-[#D5C9B8] rounded-xl bg-white px-2 py-1.5 shadow-2xs">
@@ -298,25 +327,36 @@ export function ProductDetailClient({ product, relatedProducts }: ProductDetailC
                 <Heart className={`w-4 h-4 ${isSaved ? 'fill-white stroke-white' : 'stroke-current'}`} />
               </button>
 
-              {/* Add to Cart */}
-              <button
+              {/* Bag / Add to Cart commented out for now */}
+              {/* <button
                 type="button"
                 onClick={handleAddToCart}
                 className="flex-1 bg-[#2C241E] hover:bg-[#1C1917] text-white text-xs font-semibold py-3.5 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
               >
                 <ShoppingBag className="w-4 h-4" />
                 <span>Add to Cart &bull; {formatINR(product.price * quantity)}</span>
-              </button>
+              </button> */}
+
+              {/* WhatsApp Inquiry CTA with selected product details & custom message */}
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-semibold py-3.5 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <WhatsAppIcon className="w-4 h-4" />
+                <span>Inquire on WhatsApp &bull; {formatINR(product.price * quantity)}</span>
+              </a>
             </div>
 
-            {/* Buy Now Button */}
-            <button
+            {/* Buy Now Button commented out with bag option */}
+            {/* <button
               type="button"
               onClick={handleBuyNow}
               className="w-full bg-[#B89758] hover:bg-[#C5A059] text-[#1C1917] text-xs font-bold py-3.5 px-4 rounded-xl shadow-sm transition flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Instant Buy with White-Glove Delivery</span>
-            </button>
+            </button> */}
           </div>
 
           {/* Indian PIN Code Delivery Checker */}
@@ -515,7 +555,7 @@ export function ProductDetailClient({ product, relatedProducts }: ProductDetailC
         </section>
       )}
 
-      {/* Mobile Sticky Bottom Add to Cart Bar */}
+      {/* Mobile Sticky Bottom Bar (WhatsApp inquiry replaces Add to Cart) */}
       <div className="lg:hidden fixed bottom-14 left-0 right-0 z-30 bg-[#FDFBF7]/95 backdrop-blur-md border-t border-[#E8DFD3] p-3 shadow-lg flex items-center justify-between gap-3">
         <div>
           <span className="font-serif text-base font-bold text-[#1C1917] block">
@@ -523,14 +563,23 @@ export function ProductDetailClient({ product, relatedProducts }: ProductDetailC
           </span>
           <span className="text-[10px] text-[#78716C] line-clamp-1">{selectedColor}</span>
         </div>
-        <button
+        {/* <button
           type="button"
           onClick={handleAddToCart}
           className="bg-[#2C241E] text-white text-xs font-semibold py-2.5 px-5 rounded-xl shadow-sm flex items-center gap-2 cursor-pointer"
         >
           <ShoppingBag className="w-4 h-4" />
           <span>Add to Cart</span>
-        </button>
+        </button> */}
+        <a
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-semibold py-2.5 px-5 rounded-xl shadow-sm flex items-center gap-2 cursor-pointer"
+        >
+          <WhatsAppIcon className="w-4 h-4" />
+          <span>WhatsApp</span>
+        </a>
       </div>
     </div>
   );
