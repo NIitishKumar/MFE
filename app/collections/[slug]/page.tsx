@@ -1,9 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { ChevronRight, Sparkles } from 'lucide-react';
 import { fetchCollectionBySlug, fetchProducts } from '@/services/api';
 import { ProductCard } from '@/components/ui/ProductCard';
+import { ApiFallbackState } from '@/components/ui/ApiFallbackState';
+
+export const dynamic = 'force-dynamic';
 
 interface CollectionPageProps {
   params: Promise<{ slug: string }>;
@@ -17,7 +19,17 @@ export default async function CollectionDetailPage({ params }: CollectionPagePro
   ]);
 
   if (!collection) {
-    notFound();
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <ApiFallbackState
+          title="Collection could not be loaded"
+          description="Unable to reach this design collection from the backend API. Please confirm the backend service is running and try again."
+          allowPageRetry
+          actionHref="/collections"
+          actionLabel="View All Collections"
+        />
+      </div>
+    );
   }
 
   return (
@@ -73,11 +85,22 @@ export default async function CollectionDetailPage({ params }: CollectionPagePro
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {collectionProducts.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
+        {collectionProducts.length === 0 ? (
+          <ApiFallbackState
+            compact
+            title={`No pieces found in ${collection.name}`}
+            description="No products were returned from the API for this collection right now."
+            allowPageRetry
+            actionHref="/shop"
+            actionLabel="Browse Shop"
+          />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {collectionProducts.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

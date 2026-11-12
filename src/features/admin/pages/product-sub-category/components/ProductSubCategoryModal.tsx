@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
-import { X, Check, Sparkles, AlertTriangle, Image as ImageIcon, FolderTree } from 'lucide-react';
+import { X, Check, Sparkles, AlertTriangle, FolderTree } from 'lucide-react';
 import { validateWithZod } from '@/lib/validation/zod-formik';
 import {
   productSubCategorySchema,
@@ -10,6 +10,7 @@ import {
 } from '../../../schemas/productSubCategory.schema';
 import { ProductSubCategory } from '../../../types/productSubCategory.types';
 import { ProductCategory } from '../../../types/productCategory.types';
+import { AdminImageUploadField } from '../../../components/common/AdminImageUploadField';
 
 interface ProductSubCategoryModalProps {
   isOpen: boolean;
@@ -41,6 +42,7 @@ export const ProductSubCategoryModal: React.FC<ProductSubCategoryModalProps> = (
     name: initialData?.name || '',
     slug: initialData?.slug || '',
     image_url: initialData?.imageUrl || '',
+    imageFile: null,
     is_active: initialData?.isActive ?? true,
   };
 
@@ -214,42 +216,18 @@ export const ProductSubCategoryModal: React.FC<ProductSubCategoryModalProps> = (
                   </div>
                 </div>
 
-                {/* Image URL & Thumbnail Preview */}
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-neutral-300 font-medium mb-1.5">
-                    Image URL
-                  </label>
-                  <div className="flex gap-3 items-center">
-                    <Field
-                      type="text"
-                      name="image_url"
-                      placeholder="https://example.com/images/kurtas.jpg"
-                      className="flex-1 bg-[#1e1c1a] border border-[#38332e] focus:border-[#c9a87c] rounded px-3.5 py-2.5 text-xs text-neutral-100 placeholder:text-neutral-500 outline-none transition-colors"
-                    />
-                    <div className="w-10 h-10 rounded border border-[#38322c] bg-[#1a1816] overflow-hidden shrink-0 flex items-center justify-center">
-                      {values.image_url ? (
-                        <img
-                          src={values.image_url}
-                          alt="Sub-category preview"
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLElement).style.display = 'none';
-                          }}
-                        />
-                      ) : (
-                        <ImageIcon size={14} className="text-neutral-500" />
-                      )}
-                    </div>
-                  </div>
-                  <ErrorMessage
-                    name="image_url"
-                    component="p"
-                    className="text-xs text-rose-400 mt-1 font-sans"
-                  />
-                  <p className="text-[11px] text-neutral-500 mt-1">
-                    Visual icon or thumbnail representing this sub-category in navigation and filters.
-                  </p>
-                </div>
+                {/* Sub-Category Image Upload + URL */}
+                <AdminImageUploadField
+                  label="Sub-Category Image"
+                  urlLabel="Image URL"
+                  urlFieldName="image_url"
+                  fileFieldName="imageFile"
+                  fileValue={values.imageFile}
+                  urlValue={values.image_url}
+                  setFieldValue={setFieldValue}
+                  urlPlaceholder="https://res.cloudinary.com/... or https://example.com/images/sectionals.jpg"
+                  helperText="Visual icon or thumbnail representing this sub-category in navigation and filters."
+                />
 
                 {/* Storefront Active Toggle */}
                 <div className="pt-2 border-t border-[#2e2a27]">
@@ -300,7 +278,9 @@ export const ProductSubCategoryModal: React.FC<ProductSubCategoryModalProps> = (
                     <Check size={14} />
                     <span>
                       {isSubmitting
-                        ? 'Saving...'
+                        ? values.imageFile
+                          ? 'Uploading & Saving...'
+                          : 'Saving...'
                         : isEditing
                         ? 'Update Sub-Category'
                         : 'Create Sub-Category'}

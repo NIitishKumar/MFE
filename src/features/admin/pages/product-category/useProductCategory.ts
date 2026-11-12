@@ -8,6 +8,7 @@ import {
 } from '../../types/productCategory.types';
 import { ProductCategoryFormData } from '../../schemas/productCategory.schema';
 import { productCategoryService } from '../../services/productCategory.service';
+import { resolveUploadedImageUrl } from '../../utils/imageUploadHelper';
 import { ToastItem } from '../../components/common/AdminToast';
 import { SortDirection } from '../../types/fitSize.types';
 
@@ -121,13 +122,39 @@ export function useProductCategory() {
     setDeletingCategory(null);
   };
 
-  // Form submit -> calls POST /api/v1/product-categories or PATCH /api/v1/product-categories/:id
+  // Form submit -> uploads selected images via POST /api/v1/upload/image, then creates/updates category
   const handleFormSubmit = async (values: ProductCategoryFormData) => {
     try {
+      const slug = values.id.toLowerCase().trim();
+      const [resolvedImageUrl, resolvedBannerUrl] = await Promise.all([
+        resolveUploadedImageUrl({
+          file: values.imageFile,
+          existingUrl: values.image_url,
+          folder: 'categories',
+          publicId: slug || undefined,
+        }),
+        resolveUploadedImageUrl({
+          file: values.bannerImageFile,
+          existingUrl: values.banner_image_url,
+          folder: 'categories/banners',
+          publicId: slug ? `${slug}-banner` : undefined,
+        }),
+      ]);
+
+      const categoryPayload = {
+        id: values.id,
+        title: values.title,
+        description: values.description,
+        image_url: resolvedImageUrl,
+        banner_image_url: resolvedBannerUrl,
+        order_by: values.order_by,
+        is_active: values.is_active,
+      };
+
       if (editingCategory) {
         // Update
         const targetId = editingCategory.id || editingCategory.categoryId;
-        const res = await productCategoryService.update(targetId, values);
+        const res = await productCategoryService.update(targetId, categoryPayload);
         setCategories((prev) =>
           prev.map((item) =>
             item.id === res.data.id || item.categoryId === res.data.categoryId ? res.data : item
@@ -140,15 +167,7 @@ export function useProductCategory() {
         );
       } else {
         // Create
-        const res = await productCategoryService.create({
-          id: values.id,
-          title: values.title,
-          description: values.description,
-          image_url: values.image_url,
-          banner_image_url: values.banner_image_url,
-          order_by: values.order_by,
-          is_active: values.is_active,
-        });
+        const res = await productCategoryService.create(categoryPayload);
         setCategories((prev) => [...prev, res.data]);
         showToast(
           'success',

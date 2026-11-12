@@ -124,6 +124,7 @@ export const productColorService = {
         headers: {
           'Accept': 'application/json',
         },
+        cache: 'no-store',
       });
 
       if (response.ok) {
@@ -131,15 +132,14 @@ export const productColorService = {
         const rawList = Array.isArray(json) ? json : json?.data || [];
         if (Array.isArray(rawList)) {
           const list = rawList.map(normalizeProductColor);
-          saveStoredProductColors(list);
           return { data: list, fromApi: true };
         }
       }
     } catch {
-      // Backend not yet serving GET or starting up
+      // Backend offline
     }
 
-    return { data: getStoredProductColors(), fromApi: false };
+    return { data: [], fromApi: false };
   },
 
   /**

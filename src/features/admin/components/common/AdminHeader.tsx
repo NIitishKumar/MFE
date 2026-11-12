@@ -133,7 +133,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             className={isLight ? 'text-[#8b633b]' : 'text-[#c9a87c]'}
           />
           <span className="font-mono text-[11px] uppercase tracking-wider">
-            Adwika Master Console
+            Madhav Master Console
           </span>
         </div>
 
@@ -146,7 +146,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               : 'bg-[#29221b] border-[#4a3a2c] text-[#c9a87c]'
           )}
         >
-          A
+          M
         </div>
       </div>
     </header>

@@ -71,29 +71,30 @@ export const productSubCategoryService = {
       let response = await fetch(`${API_BASE_URL}/collections`, {
         method: 'GET',
         headers: { Accept: 'application/json' },
+        cache: 'no-store',
       });
 
       if (!response.ok) {
         response = await fetch(`${API_BASE_URL}/product-sub-categories`, {
           method: 'GET',
           headers: { Accept: 'application/json' },
+          cache: 'no-store',
         });
       }
 
       if (response.ok) {
         const json = await response.json();
         const rawList = Array.isArray(json) ? json : json?.data || [];
-        if (Array.isArray(rawList) && rawList.length > 0) {
+        if (Array.isArray(rawList)) {
           const list = rawList.map(normalizeSubCategory);
-          saveStoredSubCategories(list);
           return { data: list, fromApi: true };
         }
       }
     } catch {
-      // Backend offline; fallback
+      // Backend offline
     }
 
-    return { data: getStoredSubCategories(), fromApi: false };
+    return { data: [], fromApi: false };
   },
 
   /**

@@ -48,7 +48,7 @@ export default function OfflinePage() {
 
       <div className="pt-8 border-t border-[#E8DFD3] text-xs text-[#8C827A] flex items-center justify-center gap-2">
         <PhoneCall className="w-3.5 h-3.5 text-[#443224]" />
-        <span>For telephone orders: call Bengaluru (+91 80 4920 8800) or Mumbai (+91 22 6829 4400)</span>
+        <span>For telephone orders: call <a href="tel:+917500931934" className="text-[#443224] underline">+91 75 0093 1934</a></span>
       </div>
     </div>
   );

@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { Search, X, ArrowRight, History, Sparkles, TrendingUp } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { Product } from '@/types';
-import { PRODUCTS } from '@/data/products';
 import { fetchProducts } from '@/services/api';
 
 export function SearchOverlay() {
@@ -19,11 +18,13 @@ export function SearchOverlay() {
     recentSearches,
     addRecentSearch,
     clearRecentSearches,
+    products,
     formatINR
   } = useStore();
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [liveResults, setLiveResults] = useState<Product[]>([]);
+  const displayedResults = searchQuery.trim() ? liveResults : [];
 
   useEffect(() => {
     if (isSearchOpen) {
@@ -39,7 +40,6 @@ export function SearchOverlay() {
     let active = true;
     const q = searchQuery.trim();
     if (!q) {
-      setLiveResults([]);
       return;
     }
     const timer = setTimeout(() => {
@@ -134,9 +134,9 @@ export function SearchOverlay() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs uppercase tracking-wider font-semibold text-[#8C827A]">
-                  Suggested Products ({liveResults.length})
+                  Suggested Products ({displayedResults.length})
                 </h3>
-                {liveResults.length > 0 && (
+                {displayedResults.length > 0 && (
                   <button
                     type="button"
                     onClick={handleSearchSubmit}
@@ -148,9 +148,9 @@ export function SearchOverlay() {
                 )}
               </div>
 
-              {liveResults.length > 0 ? (
+              {displayedResults.length > 0 ? (
                 <div className="divide-y divide-[#F0E9DE]">
-                  {liveResults.map((product) => (
+                  {displayedResults.map((product) => (
                     <Link
                       key={product.id}
                       href={`/product/${product.id}`}
@@ -249,33 +249,35 @@ export function SearchOverlay() {
               )}
 
               {/* Recommended Quick Highlight */}
-              <div className="space-y-3 pt-4 border-t border-[#E8DFD3]">
-                <h3 className="text-xs uppercase tracking-wider font-semibold text-[#8C827A]">
-                  Curators&apos; Choice
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {PRODUCTS.slice(0, 2).map((prod) => (
-                    <Link
-                      key={prod.id}
-                      href={`/product/${prod.id}`}
-                      onClick={() => setIsSearchOpen(false)}
-                      className="flex items-center gap-3 p-2.5 rounded-xl border border-[#EDE5D8] hover:border-[#D5C9B8] hover:bg-[#FAF7F2] transition"
-                    >
-                      <img
-                        src={prod.images[0]}
-                        alt={prod.name}
-                        className="w-14 h-14 rounded-lg object-cover bg-[#F5F1E8]"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="font-serif text-xs font-semibold text-[#1C1917] truncate">
-                          {prod.name}
-                        </p>
-                        <p className="text-xs text-[#8C827A]">{formatINR(prod.price)}</p>
-                      </div>
-                    </Link>
-                  ))}
+              {products.length > 0 && (
+                <div className="space-y-3 pt-4 border-t border-[#E8DFD3]">
+                  <h3 className="text-xs uppercase tracking-wider font-semibold text-[#8C827A]">
+                    Curators&apos; Choice
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {products.slice(0, 2).map((prod) => (
+                      <Link
+                        key={prod.id}
+                        href={`/product/${prod.id}`}
+                        onClick={() => setIsSearchOpen(false)}
+                        className="flex items-center gap-3 p-2.5 rounded-xl border border-[#EDE5D8] hover:border-[#D5C9B8] hover:bg-[#FAF7F2] transition"
+                      >
+                        <img
+                          src={prod.images[0]}
+                          alt={prod.name}
+                          className="w-14 h-14 rounded-lg object-cover bg-[#F5F1E8]"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="font-serif text-xs font-semibold text-[#1C1917] truncate">
+                            {prod.name}
+                          </p>
+                          <p className="text-xs text-[#8C827A]">{formatINR(prod.price)}</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </>
           )}
         </div>

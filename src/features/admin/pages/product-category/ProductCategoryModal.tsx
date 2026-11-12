@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
-import { X, Check, Sparkles, AlertTriangle, Image as ImageIcon } from 'lucide-react';
+import { X, Check, Sparkles, AlertTriangle } from 'lucide-react';
 import { validateWithZod } from '@/lib/validation/zod-formik';
 import {
   productCategorySchema,
   ProductCategoryFormData,
 } from '../../schemas/productCategory.schema';
 import { ProductCategory } from '../../types/productCategory.types';
+import { AdminImageUploadField } from '../../components/common/AdminImageUploadField';
 
 interface ProductCategoryModalProps {
   isOpen: boolean;
@@ -40,7 +41,9 @@ export const ProductCategoryModal: React.FC<ProductCategoryModalProps> = ({
     title: initialData?.title || '',
     description: initialData?.description || '',
     image_url: initialData?.imageUrl || '',
+    imageFile: null,
     banner_image_url: initialData?.bannerImageUrl || '',
+    bannerImageFile: null,
     order_by: initialData?.orderBy ?? nextOrderBy,
     is_active: initialData?.isActive ?? true,
   };
@@ -134,7 +137,7 @@ export const ProductCategoryModal: React.FC<ProductCategoryModalProps> = ({
                     <Field
                       type="text"
                       name="title"
-                      placeholder="e.g. Ethnic Wear, Kurtis"
+                      placeholder="e.g. Sofas, Dining Tables"
                       autoFocus
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const val = e.target.value;
@@ -161,7 +164,7 @@ export const ProductCategoryModal: React.FC<ProductCategoryModalProps> = ({
                     <Field
                       type="text"
                       name="id"
-                      placeholder="e.g. ethnic-wear"
+                      placeholder="e.g. sofas"
                       disabled={isEditing}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         setFieldValue('id', e.target.value.toLowerCase().replace(/\s+/g, '-'));
@@ -178,7 +181,7 @@ export const ProductCategoryModal: React.FC<ProductCategoryModalProps> = ({
                     <p className="text-[11px] text-neutral-500 mt-1">
                       {isEditing
                         ? 'Unique identifier cannot be modified once created.'
-                        : 'Lowercase slug for URLs and APIs (e.g. suits, ethnic-wear).'}
+                        : 'Lowercase slug for URLs and APIs (e.g. sofas, dining, beds).'}
                     </p>
                   </div>
                 </div>
@@ -192,7 +195,7 @@ export const ProductCategoryModal: React.FC<ProductCategoryModalProps> = ({
                     as="textarea"
                     rows={2}
                     name="description"
-                    placeholder="Brief description of the silhouettes, craftsmanship, or styling in this collection..."
+                    placeholder="Brief description of materials, architectural styling, or craft in this furniture category..."
                     className="w-full bg-[#1e1c1a] border border-[#38332e] focus:border-[#c9a87c] rounded px-3.5 py-2.5 text-xs text-neutral-100 placeholder:text-neutral-500 outline-none transition-colors resize-none"
                   />
                   <ErrorMessage
@@ -202,75 +205,32 @@ export const ProductCategoryModal: React.FC<ProductCategoryModalProps> = ({
                   />
                 </div>
 
-                {/* Image URL & Preview */}
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-neutral-300 font-medium mb-1.5">
-                    Category Image URL
-                  </label>
-                  <div className="flex gap-3 items-center">
-                    <Field
-                      type="text"
-                      name="image_url"
-                      placeholder="https://example.com/images/ethnic.jpg"
-                      className="flex-1 bg-[#1e1c1a] border border-[#38332e] focus:border-[#c9a87c] rounded px-3.5 py-2.5 text-xs text-neutral-100 placeholder:text-neutral-500 outline-none transition-colors"
-                    />
-                    <div className="w-10 h-10 rounded border border-[#38322c] bg-[#1a1816] overflow-hidden shrink-0 flex items-center justify-center">
-                      {values.image_url ? (
-                        <img
-                          src={values.image_url}
-                          alt="Category preview"
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLElement).style.display = 'none';
-                          }}
-                        />
-                      ) : (
-                        <ImageIcon size={14} className="text-neutral-500" />
-                      )}
-                    </div>
-                  </div>
-                  <ErrorMessage
-                    name="image_url"
-                    component="p"
-                    className="text-xs text-rose-400 mt-1 font-sans"
-                  />
-                  <p className="text-[11px] text-neutral-500 mt-1">
-                    Card thumbnail image displayed on category navigation.
-                  </p>
-                </div>
+                {/* Category Image Upload + URL */}
+                <AdminImageUploadField
+                  label="Category Image"
+                  urlLabel="Category Image URL"
+                  urlFieldName="image_url"
+                  fileFieldName="imageFile"
+                  fileValue={values.imageFile}
+                  urlValue={values.image_url}
+                  setFieldValue={setFieldValue}
+                  urlPlaceholder="https://res.cloudinary.com/... or https://example.com/images/sofas.jpg"
+                  helperText="Card thumbnail image displayed on category navigation."
+                />
 
-                {/* Banner Image URL & Preview */}
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-neutral-300 font-medium mb-1.5">
-                    Banner Image URL
-                  </label>
-                  <Field
-                    type="text"
-                    name="banner_image_url"
-                    placeholder="https://example.com/images/ethnic-banner.jpg"
-                    className="w-full bg-[#1e1c1a] border border-[#38332e] focus:border-[#c9a87c] rounded px-3.5 py-2.5 text-xs text-neutral-100 placeholder:text-neutral-500 outline-none transition-colors"
-                  />
-                  {values.banner_image_url && (
-                    <div className="mt-2 h-16 w-full rounded border border-[#38322c] bg-[#1a1816] overflow-hidden">
-                      <img
-                        src={values.banner_image_url}
-                        alt="Banner preview"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLElement).style.display = 'none';
-                        }}
-                      />
-                    </div>
-                  )}
-                  <ErrorMessage
-                    name="banner_image_url"
-                    component="p"
-                    className="text-xs text-rose-400 mt-1 font-sans"
-                  />
-                  <p className="text-[11px] text-neutral-500 mt-1">
-                    High-resolution hero header banner for the collection listing page.
-                  </p>
-                </div>
+                {/* Banner Image Upload + URL */}
+                <AdminImageUploadField
+                  label="Banner Image"
+                  urlLabel="Banner Image URL"
+                  urlFieldName="banner_image_url"
+                  fileFieldName="bannerImageFile"
+                  fileValue={values.bannerImageFile}
+                  urlValue={values.banner_image_url}
+                  setFieldValue={setFieldValue}
+                  urlPlaceholder="https://res.cloudinary.com/... or https://example.com/images/sofas-banner.jpg"
+                  helperText="High-resolution hero header banner for the collection listing page."
+                  previewMode="banner"
+                />
 
                 {/* Order and Active Status Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-[#2e2a27]">
@@ -341,7 +301,9 @@ export const ProductCategoryModal: React.FC<ProductCategoryModalProps> = ({
                     <Check size={14} />
                     <span>
                       {isSubmitting
-                        ? 'Saving...'
+                        ? values.imageFile || values.bannerImageFile
+                          ? 'Uploading & Saving...'
+                          : 'Saving...'
                         : isEditing
                         ? 'Update Category'
                         : 'Create Category'}

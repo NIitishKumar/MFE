@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Phone, Mail, MapPin, Clock, MessageSquare, CheckCircle2, ChevronRight } from 'lucide-react';
+import { Phone, MapPin, Clock, MessageSquare, CheckCircle2, ChevronRight } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 
 export default function ContactPage() {
@@ -131,7 +131,7 @@ export default function ContactPage() {
                 <Phone className="w-4 h-4 text-[#443224] shrink-0 mt-1" />
                 <div>
                   <strong className="text-[#1C1917] block">Bengaluru Studio:</strong>
-                  <a href="tel:+918049208800" className="hover:underline text-[#443224]">+91 80 4920 8800</a>
+                  <a href="tel:+917500931934" className="hover:underline text-[#443224]">+91 75 0093 1934</a>
                 </div>
               </div>
 
@@ -139,17 +139,17 @@ export default function ContactPage() {
                 <Phone className="w-4 h-4 text-[#443224] shrink-0 mt-1" />
                 <div>
                   <strong className="text-[#1C1917] block">Mumbai Gallery:</strong>
-                  <a href="tel:+912268294400" className="hover:underline text-[#443224]">+91 22 6829 4400</a>
+                  <a href="tel:+917500931934" className="hover:underline text-[#443224]">+91 75 0093 1934</a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
+              {/* <div className="flex items-start gap-3">
                 <Mail className="w-4 h-4 text-[#443224] shrink-0 mt-1" />
                 <div>
                   <strong className="text-[#1C1917] block">General &amp; Trade Inquiries:</strong>
                   <a href="mailto:concierge@auraliving.in" className="hover:underline text-[#443224]">concierge@auraliving.in</a>
                 </div>
-              </div>
+              </div> */}
 
               <div className="flex items-start gap-3">
                 <Clock className="w-4 h-4 text-[#443224] shrink-0 mt-1" />

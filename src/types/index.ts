@@ -80,9 +80,20 @@ export interface ProductFiltersMeta {
   rooms: string[];
   materials: string[];
   colors: string[];
+  sizes?: string[];
+  badges?: string[];
   minPrice: number;
   maxPrice: number;
   totalProducts: number;
+}
+
+export interface FetchProductsResponse {
+  count: number;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  data: Product[];
 }
 
 export interface CartItem {
@@ -175,4 +186,6 @@ export interface FilterState {
   badge?: string;
   rating: number; // 0 means all
   sortBy: 'featured' | 'price-low' | 'price-high' | 'rating' | 'newest';
+  page?: number;
+  limit?: number;
 }

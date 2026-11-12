@@ -2,22 +2,26 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Sparkles, MapPin, Star, ShieldCheck, HeartHandshake, Compass, CheckCircle2 } from 'lucide-react';
 import {
-  fetchFeaturedProducts,
+  fetchNewArrivalProducts,
+  fetchBestSellerProducts,
   fetchCategories,
   fetchCollections,
   fetchRooms,
 } from '@/services/api';
-import { ProductCard } from '@/components/ui/ProductCard';
+import { FeaturedCategories } from '@/features/featured-categories';
+import { NewArrivals } from '@/features/new-arrivals';
+import { BestSellers } from '@/features/best-sellers';
+
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const [featured, categories, collections, rooms] = await Promise.all([
-    fetchFeaturedProducts(),
+  const [newArrivalsData, bestSellersData, categories, collections, rooms] = await Promise.all([
+    fetchNewArrivalProducts({ limit: 4, page: 1 }),
+    fetchBestSellerProducts({ limit: 4, page: 1 }),
     fetchCategories(),
     fetchCollections(),
     fetchRooms(),
   ]);
-
-  const { newArrivals, bestSellers } = featured;
 
   const testimonials = [
     {
@@ -90,7 +94,8 @@ export default async function HomePage() {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
               </Link>
               <Link
-                href="/showroom"
+                href="https://maps.app.goo.gl/gGGeaJoxR5SY6zx9A"
+                target='_blank'
                 className="bg-black/30 hover:bg-black/50 text-white border border-white/30 backdrop-blur-md text-sm font-medium px-8 py-4 rounded-xl transition flex items-center justify-center gap-2"
               >
                 <MapPin className="w-4 h-4 text-[#D4AF37]" />
@@ -99,7 +104,7 @@ export default async function HomePage() {
             </div>
 
             {/* Quick Metrics */}
-            <div className="pt-8 border-t border-white/20 grid grid-cols-3 gap-6 text-xs text-[#E5DDD2]">
+            {/* <div className="pt-8 border-t border-white/20 grid grid-cols-3 gap-6 text-xs text-[#E5DDD2]">
               <div>
                 <span className="block font-serif text-xl sm:text-2xl font-bold text-white">100%</span>
                 <span>Solid Timber &amp; Stone</span>
@@ -112,98 +117,22 @@ export default async function HomePage() {
                 <span className="block font-serif text-xl sm:text-2xl font-bold text-white">White-Glove</span>
                 <span>In-Home Assembly</span>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </section>
 
       {/* 2. FEATURED CATEGORIES */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8">
-          <div>
-            <span className="text-xs uppercase tracking-[0.2em] font-semibold text-[#8C827A]">
-              Curated Catalog
-            </span>
-            <h2 className="font-serif text-2xl sm:text-4xl text-[#1C1917] font-normal mt-1">
-              Featured Categories
-            </h2>
-          </div>
-          <Link
-            href="/shop"
-            className="text-xs uppercase tracking-wider font-semibold text-[#443224] hover:text-[#1C1917] flex items-center gap-1 mt-2 sm:mt-0 transition group"
-          >
-            <span>View All Categories</span>
-            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {categories.map((cat, idx) => (
-            <Link
-              key={cat.id}
-              href={`/category/${cat.slug}`}
-              className={`group relative rounded-2xl overflow-hidden bg-[#F5F0E6] border border-[#E8DFD3] transition-all duration-300 hover:shadow-lg ${
-                idx === 0 ? 'col-span-2 md:col-span-1 lg:col-span-2 aspect-16/10 sm:aspect-auto' : 'aspect-4/5'
-              }`}
-            >
-              <img
-                src={cat.image}
-                alt={cat.name}
-                loading="lazy"
-                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 text-white flex items-end justify-between">
-                <div>
-                  <h3 className="font-serif text-lg sm:text-2xl font-medium">{cat.name}</h3>
-                  <p className="text-xs text-[#D8CFBF] mt-0.5 hidden sm:block line-clamp-1">
-                    {cat.description}
-                  </p>
-                  <span className="text-[11px] text-[#C5A059] font-medium tracking-wide">
-                    {cat.itemCount} Designs Available
-                  </span>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#1C1917] transition shrink-0">
-                  <ArrowRight className="w-4 h-4" />
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <FeaturedCategories initialCategories={categories} />
 
       {/* 3. NEW ARRIVALS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8">
-          <div>
-            <span className="text-xs uppercase tracking-[0.2em] font-semibold text-[#8C827A]">
-              Seasonal Release
-            </span>
-            <h2 className="font-serif text-2xl sm:text-4xl text-[#1C1917] font-normal mt-1">
-              New Arrivals
-            </h2>
-            <p className="text-xs text-[#78716C] mt-1">
-              Fresh additions exploring organic geometries and geological stonework.
-            </p>
-          </div>
-          <Link
-            href="/shop?filter=new"
-            className="text-xs uppercase tracking-wider font-semibold text-[#443224] hover:text-[#1C1917] flex items-center gap-1 mt-2 sm:mt-0 transition group"
-          >
-            <span>Explore All New</span>
-            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {newArrivals.map((prod, idx) => (
-            <ProductCard key={prod.id} product={prod} priority={idx < 2} />
-          ))}
-        </div>
-      </section>
+      <NewArrivals
+        initialData={newArrivalsData}
+        initialCategories={categories}
+      />
 
       {/* 4. EDITORIAL BANNER (Split Layout) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      {/* <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="bg-[#241E1A] rounded-3xl overflow-hidden text-white grid grid-cols-1 lg:grid-cols-12 border border-[#382F28] shadow-xl">
           <div className="lg:col-span-7 relative min-h-[360px] lg:min-h-[500px]">
             <img
@@ -241,40 +170,16 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* 5. BEST SELLERS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8">
-          <div>
-            <span className="text-xs uppercase tracking-[0.2em] font-semibold text-[#8C827A]">
-              Most Coveted
-            </span>
-            <h2 className="font-serif text-2xl sm:text-4xl text-[#1C1917] font-normal mt-1">
-              Best Sellers
-            </h2>
-            <p className="text-xs text-[#78716C] mt-1">
-              Our most celebrated architectural staples, favored by discerning architects and homeowners.
-            </p>
-          </div>
-          <Link
-            href="/shop?filter=best-seller"
-            className="text-xs uppercase tracking-wider font-semibold text-[#443224] hover:text-[#1C1917] flex items-center gap-1 mt-2 sm:mt-0 transition group"
-          >
-            <span>View All Best Sellers</span>
-            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {bestSellers.map((prod) => (
-            <ProductCard key={prod.id} product={prod} />
-          ))}
-        </div>
-      </section>
+      <BestSellers
+        initialData={bestSellersData}
+        initialCategories={categories}
+      />
 
       {/* 5.5 CURATED DESIGN COLLECTIONS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      {/* <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8">
           <div>
             <span className="text-xs uppercase tracking-[0.2em] font-semibold text-[#8C827A]">
@@ -326,10 +231,10 @@ export default async function HomePage() {
             </Link>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* 6. SHOP BY ROOM */}
-      <section className="bg-[#F5F0E6] py-16 sm:py-20 border-y border-[#E8DFD3]">
+      {/* <section className="bg-[#F5F0E6] py-16 sm:py-20 border-y border-[#E8DFD3]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-xl mx-auto mb-12">
             <span className="text-xs uppercase tracking-[0.2em] font-semibold text-[#8C827A]">
@@ -371,7 +276,7 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* 7. WHY CHOOSE US */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -428,7 +333,7 @@ export default async function HomePage() {
       </section>
 
       {/* 8. SHOWROOM EXPERIENCE CTA */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      {/* <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="relative rounded-3xl overflow-hidden bg-[#241E1A] text-white p-8 sm:p-14 lg:p-20 border border-[#3D332B] shadow-2xl">
           <div className="absolute inset-0 z-0">
             <img
@@ -468,10 +373,10 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* 9. TESTIMONIALS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      {/* <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="text-center max-w-xl mx-auto mb-12">
           <span className="text-xs uppercase tracking-[0.2em] font-semibold text-[#8C827A]">
             Verified Homeowners
@@ -512,7 +417,7 @@ export default async function HomePage() {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

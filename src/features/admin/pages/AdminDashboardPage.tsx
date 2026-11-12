@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAdminTheme } from '../context/AdminThemeContext';
 import { cn } from '@/lib/utils';
+import { API_BASE_URL } from '@/config/api.config';
 
 export const AdminDashboardPage: React.FC = () => {
   const { isLight } = useAdminTheme();
@@ -148,7 +149,7 @@ export const AdminDashboardPage: React.FC = () => {
 
         {/* Ambient watermark */}
         <div className="absolute right-6 -bottom-6 opacity-15 select-none pointer-events-none hidden md:block">
-          <span className="font-serif text-9xl tracking-widest text-[#c9a87c]">ADWIKA</span>
+          <span className="font-serif text-9xl tracking-widest text-[#c9a87c]">MADHAV</span>
         </div>
       </div>
 
@@ -270,7 +271,7 @@ export const AdminDashboardPage: React.FC = () => {
                   : 'text-[#c9a87c] bg-[#1e1b18]'
               )}
             >
-              http://localhost:3001/api/v1
+              {API_BASE_URL}
             </code>
             )
           </span>

@@ -25,11 +25,28 @@ export function PWAInstallBanner() {
 
     window.addEventListener('beforeinstallprompt', handler);
 
-    // Register service worker if supported
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
-      navigator.serviceWorker.register('/sw.js').catch((err) => {
-        console.warn('Service worker registration failed:', err);
-      });
+    // Register service worker in production; unregister stale SW & clear caches in dev
+    if ('serviceWorker' in navigator) {
+      if (process.env.NODE_ENV === 'production') {
+        navigator.serviceWorker.register('/sw.js').catch((err) => {
+          console.warn('Service worker registration failed:', err);
+        });
+      } else {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          registrations.forEach((registration) => {
+            registration.unregister().catch(() => {});
+          });
+        });
+        if ('caches' in window) {
+          caches.keys().then((keys) => {
+            keys.forEach((key) => {
+              if (key.startsWith('aura-living-cache')) {
+                caches.delete(key).catch(() => {});
+              }
+            });
+          });
+        }
+      }
     }
 
     return () => window.removeEventListener('beforeinstallprompt', handler);

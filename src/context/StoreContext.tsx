@@ -1,8 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Product, CartItem, Address, Order } from '@/types';
-import { PRODUCTS } from '@/data/products';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { Product, CartItem, Address, Order, Category } from '@/types';
+import { fetchCategories, fetchProducts } from '@/services/api';
 
 export interface UserProfile {
   name: string;
@@ -78,6 +78,14 @@ interface StoreContextType {
   addToast: (message: string, type?: 'success' | 'info' | 'error') => void;
   removeToast: (id: string) => void;
 
+  // Categories & Products (Live API)
+  categories: Category[];
+  isCategoriesLoading: boolean;
+  refreshCategories: () => Promise<void>;
+  products: Product[];
+  isProductsLoading: boolean;
+  refreshProducts: () => Promise<void>;
+
   // Utilities
   formatINR: (val: number) => string;
 }
@@ -113,38 +121,7 @@ const DEFAULT_ADDRESSES: Address[] = [
   }
 ];
 
-const DEFAULT_ORDERS: Order[] = [
-  {
-    id: 'ord-84920',
-    orderNumber: 'AURA-2026-84920',
-    createdAt: '2026-08-28T14:30:00Z',
-    items: [
-      {
-        product: PRODUCTS[0], // Sorrento curved boucle sofa
-        quantity: 1,
-        selectedColor: 'Oatmeal Bouclé',
-        selectedSize: '4-Seater Grande (260 cm)'
-      }
-    ],
-    shippingAddress: DEFAULT_ADDRESSES[0],
-    deliveryMethod: 'white-glove',
-    paymentMethod: 'upi',
-    subtotal: 145000,
-    deliveryFee: 0,
-    discount: 0,
-    total: 145000,
-    status: 'Shipped',
-    trackingSteps: [
-      { title: 'Order Confirmed', description: 'Your order was verified and hand-crafted scheduling initiated.', date: '28 Aug 2026', completed: true, current: false },
-      { title: 'Artisan Quality Inspection', description: 'Passed structural inspection and upholstery seam inspection.', date: '30 Aug 2026', completed: true, current: false },
-      { title: 'Dispatched via White Glove Logistics', description: 'En route via climate-controlled furniture transit from Bengaluru studio.', date: '02 Sep 2026', completed: true, current: true },
-      { title: 'Out for In-Home Assembly', description: 'Technicians will arrive at your selected delivery window.', date: 'Expected 05 Sep', completed: false, current: false },
-      { title: 'Delivered & Placed', description: 'Assembly completed and packaging safely recycled.', date: 'Expected 05 Sep', completed: false, current: false }
-    ],
-    paymentStatus: 'Paid',
-    estimatedDelivery: 'Saturday, 05 September 2026'
-  }
-];
+const DEFAULT_ORDERS: Order[] = [];
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -168,6 +145,56 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   ]);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState<boolean>(true);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isProductsLoading, setIsProductsLoading] = useState<boolean>(true);
+
+  const refreshCategories = useCallback(async () => {
+    setIsCategoriesLoading(true);
+    try {
+      const apiCategories = await fetchCategories();
+      setCategories(apiCategories);
+    } finally {
+      setIsCategoriesLoading(false);
+    }
+  }, []);
+
+  const refreshProducts = useCallback(async () => {
+    setIsProductsLoading(true);
+    try {
+      const res = await fetchProducts({ limit: 50, page: 1 });
+      setProducts(res.data);
+    } finally {
+      setIsProductsLoading(false);
+    }
+  }, []);
+
+  // Load categories & products exclusively from API responses
+  useEffect(() => {
+    let active = true;
+    const loadCatalog = async () => {
+      try {
+        const [apiCategories, productsRes] = await Promise.all([
+          fetchCategories(),
+          fetchProducts({ limit: 50, page: 1 }),
+        ]);
+        if (active) {
+          setCategories(apiCategories);
+          setProducts(productsRes.data);
+        }
+      } finally {
+        if (active) {
+          setIsCategoriesLoading(false);
+          setIsProductsLoading(false);
+        }
+      }
+    };
+    loadCatalog();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Initialize from LocalStorage
   useEffect(() => {
@@ -323,7 +350,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   // Wishlist actions
   const toggleWishlist = (productId: string) => {
-    const product = PRODUCTS.find((p) => p.id === productId);
+    const product = products.find((p) => p.id === productId);
     setWishlist((prev) => {
       if (prev.includes(productId)) {
         addToast(`Removed "${product?.name || 'Item'}" from wishlist.`, 'info');
@@ -337,7 +364,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const isInWishlist = (productId: string) => wishlist.includes(productId);
   const wishlistCount = wishlist.length;
-  const wishlistProducts = PRODUCTS.filter((p) => wishlist.includes(p.id));
+  const wishlistProducts = products.filter((p) => wishlist.includes(p.id));
 
   // User actions
   const login = (email: string, name = 'Valued Customer') => {
@@ -551,6 +578,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         toasts,
         addToast,
         removeToast,
+
+        categories,
+        isCategoriesLoading,
+        refreshCategories,
+        products,
+        isProductsLoading,
+        refreshProducts,
 
         formatINR
       }}

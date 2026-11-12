@@ -265,7 +265,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
 
           {/* Version Hallmark */}
           <div className="px-3 pt-1 text-[10px] text-neutral-500 font-mono flex items-center justify-between">
-            <span>Adwika Console</span>
+            <span>Madhav Console</span>
             <span className="text-emerald-500 flex items-center gap-1 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               v1.0

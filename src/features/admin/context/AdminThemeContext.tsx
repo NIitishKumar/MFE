@@ -14,7 +14,7 @@ interface AdminThemeContextType {
 
 const AdminThemeContext = createContext<AdminThemeContextType | undefined>(undefined);
 
-const THEME_STORAGE_KEY = 'adwika_admin_theme';
+const THEME_STORAGE_KEY = 'mfe_admin_theme';
 
 export const AdminThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<AdminTheme>(() => {

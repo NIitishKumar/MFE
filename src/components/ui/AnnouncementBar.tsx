@@ -4,7 +4,16 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Sparkles, X, ChevronRight } from 'lucide-react';
 
-export function AnnouncementBar() {
+const DEFAULT_ANNOUNCEMENT_MESSAGE =
+  'Thoughtfully crafted furniture & timeless design for modern living';
+
+interface AnnouncementBarProps {
+  message?: string;
+}
+
+export function AnnouncementBar({
+  message = DEFAULT_ANNOUNCEMENT_MESSAGE,
+}: AnnouncementBarProps) {
   const [isVisible, setIsVisible] = useState(true);
 
   if (!isVisible) return null;
@@ -14,9 +23,7 @@ export function AnnouncementBar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex-1 flex items-center justify-center gap-2 text-center">
           <Sparkles className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
-          <span>
-            Complimentary White-Glove delivery &amp; in-home assembly on orders above ₹50,000
-          </span>
+          <span>{message}</span>
           <Link
             href="/shop"
             className="hidden sm:inline-flex items-center gap-0.5 underline hover:text-[#D4AF37] transition ml-1.5"

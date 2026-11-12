@@ -147,6 +147,7 @@ export const productImageService = {
         headers: {
           Accept: 'application/json',
         },
+        cache: 'no-store',
       });
 
       if (response.ok) {
@@ -154,7 +155,6 @@ export const productImageService = {
         const rawList = Array.isArray(json) ? json : json?.data || [];
         if (Array.isArray(rawList)) {
           const list = rawList.map(normalizeImage);
-          saveStoredImages(list);
           const filtered = productId
             ? list.filter(
                 (img) =>
@@ -167,22 +167,10 @@ export const productImageService = {
         }
       }
     } catch {
-      // Backend offline or booting; fallback to local storage
+      // Backend offline
     }
 
-    const stored = getStoredImages();
-    if (productId) {
-      return {
-        data: stored.filter(
-          (img) =>
-            img.productId === productId ||
-            img.product?.id === productId ||
-            img.product?.uniqueId === productId
-        ),
-        fromApi: false,
-      };
-    }
-    return { data: stored, fromApi: false };
+    return { data: [], fromApi: false };
   },
 
   /**

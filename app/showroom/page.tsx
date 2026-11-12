@@ -6,7 +6,6 @@ import {
   MapPin,
   Clock,
   Phone,
-  Mail,
   Car,
   Sparkles,
   Calendar,
@@ -202,13 +201,13 @@ export default function ShowroomPage() {
                 <Phone className="w-4 h-4 text-[#443224] shrink-0 mt-1" />
                 <div>
                   <strong className="text-[#1C1917] block">Concierge Telephone:</strong>
-                  <a href={`tel:${selectedShowroom.phone}`} className="hover:underline text-[#1C1917]">
+                  <a href={`tel:${selectedShowroom.phone.replace(/\s+/g, '')}`} className="hover:underline text-[#1C1917]">
                     {selectedShowroom.phone}
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
+              {/* <div className="flex items-start gap-3">
                 <Mail className="w-4 h-4 text-[#443224] shrink-0 mt-1" />
                 <div>
                   <strong className="text-[#1C1917] block">Direct Studio Inquiries:</strong>
@@ -216,7 +215,7 @@ export default function ShowroomPage() {
                     {selectedShowroom.email}
                   </a>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Amenities Library */}

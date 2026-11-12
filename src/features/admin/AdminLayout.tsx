@@ -20,49 +20,49 @@ const AdminLayoutInner: React.FC<AdminLayoutProps> = ({ children }) => {
     if (pathname.includes('/admin/product-attributes')) {
       return [
         { label: 'Catalog Master', to: '/admin' },
-        { label: 'Product Attributes' },
+        { label: 'Specs & Materials' },
       ];
     }
     if (pathname.includes('/admin/product-sub-categories')) {
       return [
         { label: 'Catalog Master', to: '/admin' },
-        { label: 'Product Sub-Categories' },
+        { label: 'Curated Collections' },
       ];
     }
     if (pathname.includes('/admin/product-categories')) {
       return [
         { label: 'Catalog Master', to: '/admin' },
-        { label: 'Product Categories' },
+        { label: 'Categories' },
       ];
     }
     if (pathname.includes('/admin/fit-sizes')) {
       return [
         { label: 'Catalog Master', to: '/admin' },
-        { label: 'Fit Sizes' },
+        { label: 'Architectural Rooms' },
       ];
     }
     if (pathname.includes('/admin/product-colors')) {
       return [
         { label: 'Catalog Master', to: '/admin' },
-        { label: 'Product Colors' },
+        { label: 'Swatches & Finishes' },
       ];
     }
     if (pathname.includes('/admin/product-variants')) {
       return [
         { label: 'Catalog Master', to: '/admin' },
-        { label: 'Product Variants' },
+        { label: 'Dimension Variants' },
       ];
     }
     if (pathname.includes('/admin/product-images')) {
       return [
         { label: 'Catalog Master', to: '/admin' },
-        { label: 'Product Images' },
+        { label: 'Gallery & Assets' },
       ];
     }
     if (pathname.includes('/admin/products')) {
       return [
         { label: 'Catalog Master', to: '/admin' },
-        { label: 'Products Catalog' },
+        { label: 'Furniture Pieces' },
       ];
     }
     return [{ label: 'Admin Console' }];

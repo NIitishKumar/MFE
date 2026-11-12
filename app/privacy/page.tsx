@@ -43,7 +43,9 @@ export default function PrivacyPage() {
         <section className="space-y-2">
           <h2 className="font-serif text-lg font-semibold text-[#1C1917]">4. Contact Us</h2>
           <p>
-            For privacy inquiries or deletion requests, email our data officer at <a href="mailto:privacy@madhavfurnitures.in" className="text-[#443224] underline">privacy@madhavfurnitures.in</a>.
+            For privacy inquiries or deletion requests, call our data officer at{' '}
+            <a href="tel:+917500931934" className="text-[#443224] underline">+91 75 0093 1934</a>.
+            {/* For privacy inquiries or deletion requests, email our data officer at <a href="mailto:privacy@madhavfurnitures.in" className="text-[#443224] underline">privacy@madhavfurnitures.in</a>. */}
           </p>
         </section>
       </div>

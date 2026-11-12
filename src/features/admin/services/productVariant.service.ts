@@ -243,6 +243,7 @@ export const productVariantService = {
 
       const response = await fetch(url, {
         headers: { Accept: 'application/json' },
+        cache: 'no-store',
       });
 
       if (response.ok) {
@@ -250,22 +251,14 @@ export const productVariantService = {
         const rawList = Array.isArray(json) ? json : json?.data || [];
         if (Array.isArray(rawList)) {
           const list = rawList.map(normalizeVariant);
-          saveStoredVariants(list);
           return { data: list, fromApi: true };
         }
       }
     } catch {
-      // Backend offline or booting; fallback to local storage
+      // Backend offline
     }
 
-    const stored = getStoredVariants();
-    if (productId) {
-      return {
-        data: stored.filter((v) => v.productId === productId),
-        fromApi: false,
-      };
-    }
-    return { data: stored, fromApi: false };
+    return { data: [], fromApi: false };
   },
 
   /**

@@ -8,6 +8,7 @@ import {
 } from '../../types/productImage.types';
 import { ProductImageFormData } from '../../schemas/productImage.schema';
 import { productImageService } from '../../services/productImage.service';
+import { resolveUploadedImageUrl } from '../../utils/imageUploadHelper';
 import { Product } from '../../types/product.types';
 import { productService } from '../../services/product.service';
 import { ToastItem } from '../../components/common/AdminToast';
@@ -165,14 +166,30 @@ export function useProductImage() {
     setDeletingImage(null);
   };
 
-  // Form submit -> calls POST /api/v1/product-images or PATCH /api/v1/product-images/:id
+  // Form submit -> uploads image if selected via POST /api/v1/upload/image, then creates/updates product image
   const handleFormSubmit = async (values: ProductImageFormData) => {
     try {
       const parentProd = productMap.get(values.productId);
+      const resolvedImageUrl = await resolveUploadedImageUrl({
+        file: values.imageFile,
+        existingUrl: values.image_url,
+        folder: 'products',
+        publicId: parentProd?.slug
+          ? `${parentProd.slug}-${values.display_order}`
+          : undefined,
+      });
+
+      const imagePayload = {
+        productId: values.productId,
+        image_url: resolvedImageUrl,
+        alt_text: values.alt_text,
+        display_order: values.display_order,
+        is_primary: values.is_primary,
+      };
 
       if (editingImage) {
         // Update
-        const res = await productImageService.update(editingImage.id, values);
+        const res = await productImageService.update(editingImage.id, imagePayload);
         const itemToStore: ProductImage = {
           ...res.data,
           product: res.data.product || (parentProd ? {
@@ -195,7 +212,7 @@ export function useProductImage() {
         showToast('success', res.message || 'Product image updated successfully', 'Image Updated');
       } else {
         // Create
-        const res = await productImageService.create(values);
+        const res = await productImageService.create(imagePayload);
         const itemToStore: ProductImage = {
           ...res.data,
           product: res.data.product || (parentProd ? {

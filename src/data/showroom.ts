@@ -29,7 +29,7 @@ export const SHOWROOMS: ShowroomLocation[] = [
     name: 'Madhav Furnitures Flagship Sanctuary',
     address: '42, 100 Feet Road, HAL 2nd Stage, Indiranagar, Bengaluru, Karnataka',
     pincode: '560038',
-    phone: '+91 80 4920 8800',
+    phone: '+91 75 0093 1934',
     email: 'indiranagar@madhavfurnitures.in',
     hours: {
       weekdays: '10:30 AM – 8:00 PM (Tuesday – Friday)',
@@ -62,7 +62,7 @@ export const SHOWROOMS: ShowroomLocation[] = [
     name: 'Madhav Furnitures Seafront Gallery',
     address: 'Level 2, The Mills, Senapati Bapat Marg, Lower Parel / Worli, Mumbai, Maharashtra',
     pincode: '400013',
-    phone: '+91 22 6829 4400',
+    phone: '+91 75 0093 1934',
     email: 'worli@madhavfurnitures.in',
     hours: {
       weekdays: '11:00 AM – 8:30 PM (Daily)',

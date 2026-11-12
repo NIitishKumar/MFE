@@ -8,6 +8,7 @@ import {
 } from '../../types/productSubCategory.types';
 import { ProductSubCategoryFormData } from '../../schemas/productSubCategory.schema';
 import { productSubCategoryService } from '../../services/productSubCategory.service';
+import { resolveUploadedImageUrl } from '../../utils/imageUploadHelper';
 import { ProductCategory } from '../../types/productCategory.types';
 import { productCategoryService } from '../../services/productCategory.service';
 import { ToastItem } from '../../components/common/AdminToast';
@@ -154,15 +155,29 @@ export function useProductSubCategory() {
     setDeletingSubCategory(null);
   };
 
-  // Form submit -> calls POST /api/v1/product-sub-categories or PATCH /api/v1/product-sub-categories/:id
+  // Form submit -> uploads image if selected via POST /api/v1/upload/image, then creates/updates sub-category
   const handleFormSubmit = async (values: ProductSubCategoryFormData) => {
     try {
       const parentCat = categoryMap.get(values.categoryId);
+      const resolvedImageUrl = await resolveUploadedImageUrl({
+        file: values.imageFile,
+        existingUrl: values.image_url,
+        folder: 'sub-categories',
+        publicId: values.slug || undefined,
+      });
+
+      const subCategoryPayload = {
+        categoryId: values.categoryId,
+        name: values.name,
+        slug: values.slug,
+        image_url: resolvedImageUrl,
+        is_active: values.is_active,
+      };
 
       if (editingSubCategory) {
         // Update
         const targetId = editingSubCategory.id || editingSubCategory.slug;
-        const res = await productSubCategoryService.update(targetId, values);
+        const res = await productSubCategoryService.update(targetId, subCategoryPayload);
 
         // Augment with parent category info if missing in response
         const itemToStore: ProductSubCategory = {
@@ -187,13 +202,7 @@ export function useProductSubCategory() {
         );
       } else {
         // Create
-        const res = await productSubCategoryService.create({
-          categoryId: values.categoryId,
-          name: values.name,
-          slug: values.slug,
-          image_url: values.image_url,
-          is_active: values.is_active,
-        });
+        const res = await productSubCategoryService.create(subCategoryPayload);
 
         const itemToStore: ProductSubCategory = {
           ...res.data,

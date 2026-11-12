@@ -141,6 +141,7 @@ export const productAttributeService = {
         headers: {
           Accept: 'application/json',
         },
+        cache: 'no-store',
       });
 
       if (response.ok) {
@@ -148,22 +149,14 @@ export const productAttributeService = {
         const rawList = Array.isArray(json) ? json : json?.data || [];
         if (Array.isArray(rawList)) {
           const list = rawList.map(normalizeAttribute);
-          saveStoredAttributes(list);
           return { data: list, fromApi: true };
         }
       }
     } catch {
-      // Backend offline or booting; fallback to local storage
+      // Backend offline
     }
 
-    const stored = getStoredAttributes();
-    if (productId) {
-      return {
-        data: stored.filter((a) => a.productId === productId),
-        fromApi: false,
-      };
-    }
-    return { data: stored, fromApi: false };
+    return { data: [], fromApi: false };
   },
 
   /**

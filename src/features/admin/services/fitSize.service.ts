@@ -60,29 +60,30 @@ export const fitSizeService = {
       let response = await fetch(`${API_BASE_URL}/rooms`, {
         method: 'GET',
         headers: { Accept: 'application/json' },
+        cache: 'no-store',
       });
 
       if (!response.ok) {
         response = await fetch(`${API_BASE_URL}/fit-sizes`, {
           method: 'GET',
           headers: { Accept: 'application/json' },
+          cache: 'no-store',
         });
       }
 
       if (response.ok) {
         const json = await response.json();
         const rawList = Array.isArray(json) ? json : json?.data || [];
-        if (Array.isArray(rawList) && rawList.length > 0) {
+        if (Array.isArray(rawList)) {
           const list = rawList.map(normalizeFitSize);
-          saveStoredFitSizes(list);
           return { data: list, fromApi: true };
         }
       }
     } catch {
-      // Backend offline; fallback
+      // Backend offline
     }
 
-    return { data: getStoredFitSizes(), fromApi: false };
+    return { data: [], fromApi: false };
   },
 
   /**

@@ -1,14 +1,20 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Product,
+  ProductBadge,
   ProductStatusFilter,
   ProductSortField,
 } from '../../types/product.types';
 import { ProductFormData } from '../../schemas/product.schema';
 import { productService } from '../../services/product.service';
-import { fetchCategories, fetchRooms, fetchCollections } from '@/services/api';
+import {
+  fetchCategories,
+  fetchRooms,
+  fetchCollections,
+} from '@/services/api';
+import { resolveUploadedImageUrl } from '../../utils/imageUploadHelper';
 import { Category, Room, Collection } from '@/types';
 import { ToastItem } from '../../components/common/AdminToast';
 
@@ -54,7 +60,7 @@ export function useProduct() {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  const loadDependencies = async () => {
+  const loadDependencies = useCallback(async () => {
     try {
       const [cats, rms, cols] = await Promise.all([
         fetchCategories(),
@@ -67,25 +73,48 @@ export function useProduct() {
     } catch (e) {
       console.error('Failed to load dependencies', e);
     }
-  };
+  }, []);
 
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await productService.getAll();
+      const res = await productService.getAll({ limit: 100 });
       setProducts(res.data);
       setIsLiveApi(res.fromApi);
-    } catch (err: any) {
-      showToast('error', err?.message || 'Failed to load products from server', 'Load Error');
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : 'Failed to load products from server';
+      showToast('error', msg, 'Load Error');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadProducts();
-    loadDependencies();
-  }, []);
+    let active = true;
+    const init = async () => {
+      try {
+        const res = await productService.getAll({ limit: 100 });
+        if (active) {
+          setProducts(res.data);
+          setIsLiveApi(res.fromApi);
+        }
+      } catch (err: unknown) {
+        if (active) {
+          const msg =
+            err instanceof Error ? err.message : 'Failed to load products from server';
+          showToast('error', msg, 'Load Error');
+        }
+      } finally {
+        if (active) setIsLoading(false);
+      }
+      await loadDependencies();
+    };
+    init();
+    return () => {
+      active = false;
+    };
+  }, [loadDependencies]);
 
   // Filter & Sort
   const filteredProducts = useMemo(() => {
@@ -170,15 +199,47 @@ export function useProduct() {
         .map((m) => m.trim())
         .filter(Boolean);
 
+      const resolvedSlug =
+        values.slug?.trim() ||
+        values.name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '');
+
+      const resolvedPrimaryImage = await resolveUploadedImageUrl({
+        file: values.imageFile,
+        existingUrl: values.primaryImage,
+        folder: 'products',
+        publicId: resolvedSlug || undefined,
+      });
+
+      const secondaryImages = editingProduct?.images?.slice(1) ?? [];
+      const images = resolvedPrimaryImage
+        ? [resolvedPrimaryImage, ...secondaryImages.filter((img) => img !== resolvedPrimaryImage)]
+        : ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc'];
+
+      const matchedCategory = categories.find((c) => c.slug === values.category.trim());
+      const matchedRoom = rooms.find((r) => r.slug === values.room.trim());
+      const matchedCollection = collections.find(
+        (c) => c.slug === (values.collectionSlug || '').trim(),
+      );
+
       const payload = {
         name: values.name.trim(),
-        slug: values.slug?.trim() || values.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        slug: resolvedSlug,
         category: values.category.trim(),
-        categoryLabel: values.categoryLabel?.trim() || values.category.charAt(0).toUpperCase() + values.category.slice(1),
+        categoryLabel:
+          values.categoryLabel?.trim() ||
+          matchedCategory?.name ||
+          values.category.charAt(0).toUpperCase() + values.category.slice(1),
         room: values.room.trim(),
-        roomLabel: values.roomLabel?.trim() || values.room.charAt(0).toUpperCase() + values.room.slice(1),
-        collectionSlug: values.collectionSlug?.trim(),
-        collectionName: values.collectionName?.trim(),
+        roomLabel:
+          values.roomLabel?.trim() ||
+          matchedRoom?.name ||
+          values.room.charAt(0).toUpperCase() + values.room.slice(1),
+        collectionSlug: values.collectionSlug?.trim() || undefined,
+        collectionName:
+          values.collectionName?.trim() || matchedCollection?.name || undefined,
         price: Number(values.price),
         originalPrice: values.originalPrice ? Number(values.originalPrice) : undefined,
         discountPercentage: values.discountPercentage ? Number(values.discountPercentage) : undefined,
@@ -194,9 +255,9 @@ export function useProduct() {
           seatHeight: values.seatHeight?.trim(),
           weight: values.weight?.trim(),
         },
-        images: values.primaryImage ? [values.primaryImage.trim()] : ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc'],
+        images,
         inStock: values.inStock,
-        badges: values.badges as any[],
+        badges: values.badges as ProductBadge[],
         careInstructions: values.careInstructions?.trim(),
         warranty: values.warranty?.trim(),
         leadTime: values.leadTime?.trim(),
@@ -214,8 +275,8 @@ export function useProduct() {
 
       setIsFormModalOpen(false);
       setEditingProduct(null);
-    } catch (err: any) {
-      const msg = err?.message || 'Failed to save product';
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to save product';
       showToast('error', msg, 'Server Error');
       throw err;
     }
@@ -230,8 +291,9 @@ export function useProduct() {
       showToast('success', res.message || `Deleted "${deletingProduct.name}" successfully`, 'Deleted');
       setIsDeleteModalOpen(false);
       setDeletingProduct(null);
-    } catch (err: any) {
-      showToast('error', err?.message || 'Failed to delete product', 'Error');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to delete product';
+      showToast('error', msg, 'Error');
     } finally {
       setIsDeleting(false);
     }
@@ -245,8 +307,10 @@ export function useProduct() {
       const res = await productService.toggleStatus(id, current.inStock);
       setProducts((prev) => prev.map((p) => (p.id === id ? res.data : p)));
       showToast('success', `"${res.data.name}" is now ${res.data.inStock ? 'In Stock' : 'Out of Stock'}.`, 'Stock Status');
-    } catch (err: any) {
-      showToast('error', err?.message || 'Failed to toggle stock status', 'Error');
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : 'Failed to toggle stock status';
+      showToast('error', msg, 'Error');
     }
   };
 
