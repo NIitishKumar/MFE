@@ -127,11 +127,11 @@ export default async function HomePage() {
           <div className="max-w-2xl text-white space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-xs uppercase tracking-widest text-[#FDFBF7]">
               <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
-              <span>Architectural Furniture &bull; 2026 Collection</span>
+              <span>Madhav Furniture &bull; Official Store</span>
             </div>
 
             <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-light tracking-tight leading-[1.08] text-white">
-              Furniture that makes space feel like home.
+              Madhav Furniture — Architectural &amp; Solid Wood Living.
             </h1>
 
             <p className="text-base sm:text-lg text-[#EDE5DA] font-light leading-relaxed max-w-xl">

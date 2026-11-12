@@ -23,6 +23,39 @@ export interface ShowroomLocation {
 
 export const SHOWROOMS: ShowroomLocation[] = [
   {
+    id: 'showroom-sikandrabad',
+    city: 'Sikandrabad',
+    neighborhood: "Teacher's Colony",
+    name: 'Madhav Furniture Flagship Showroom & Atelier',
+    address: "Above BDS Convent School, Teacher's Colony, Old NH 91, Bulandshahr Road, Sikandrabad, Uttar Pradesh",
+    pincode: '203205',
+    phone: '+91 75 0093 1934',
+    email: 'contact@madhavfurnitures.in',
+    hours: {
+      weekdays: '10:00 AM – 8:30 PM (Daily)',
+      weekends: '10:00 AM – 9:00 PM (Saturday – Sunday)'
+    },
+    parking: 'Private customer parking available on premises.',
+    amenities: [
+      'Full Range Living Room, Bedroom & Dining Displays',
+      'Solid Hardwood, Teak & Sheesham Craftsmanship Atelier',
+      'Custom Upholstery & Cushion Comfort Bar',
+      'Direct Factory Consultation with Master Carpenters',
+      'Dedicated Loading & White-Glove Dispatch Bay'
+    ],
+    heroImage: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1600&q=85',
+    gallery: [
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=85',
+      'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=85',
+      'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=1000&q=85',
+      'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=1000&q=85'
+    ],
+    coordinates: {
+      lat: 28.4503,
+      lng: 77.6975
+    }
+  },
+  {
     id: 'showroom-bengaluru',
     city: 'Bengaluru',
     neighborhood: 'Indiranagar',

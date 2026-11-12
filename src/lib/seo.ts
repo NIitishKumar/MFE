@@ -3,32 +3,39 @@ import type { Product } from '@/types';
 import { SHOWROOMS } from '@/data/showroom';
 import { WHATSAPP_PHONE_NUMBER } from '@/lib/whatsapp';
 
-export const SITE_NAME = 'Madhav Furnitures';
-export const SITE_LEGAL_NAME = 'Madhav Furnitures India Pvt. Ltd.';
+export const SITE_NAME = 'Madhav Furniture';
+export const SITE_LEGAL_NAME = 'Madhav Furniture India';
 export const DEFAULT_TITLE =
-  'Madhav Furnitures — Luxury Solid Wood & Architectural Furniture India';
+  'Madhav Furniture | Official Website — Luxury Solid Wood & Modern Living';
 export const DEFAULT_DESCRIPTION =
-  'Thoughtfully designed architectural furniture crafted for modern Indian living. Explore hand-honed travertine dining tables, curved bouclé sofas, solid oak beds, and bespoke pieces across our Bengaluru & Mumbai showrooms.';
+  'Madhav Furniture official store. Handcrafted solid wood furniture, designer beds with wall matching sets, designer double beds, luxury L-shape sofas, travertine dining tables, and custom wardrobes with White-Glove delivery across India. Visit our flagship showroom in Sikandrabad (UP).';
 export const DEFAULT_OG_IMAGE_PATH = '/opengraph-image';
 export const DEFAULT_TWITTER_IMAGE_PATH = '/twitter-image';
 export const PHONE_DISPLAY = '+91 75 0093 1934';
 export const PHONE_E164 = '+91-7500931934';
 export const WHATSAPP_CONTACT_URL = `https://wa.me/${WHATSAPP_PHONE_NUMBER}`;
 
+export const GOOGLE_MAPS_PROFILE_URL =
+  'https://maps.app.goo.gl/gGGeaJoxR5SY6zx9A';
+
 export const DEFAULT_KEYWORDS = [
+  'Madhav Furniture',
+  'Madhav Furniture official website',
   'Madhav Furnitures',
+  'Madhav Furniture Sikandrabad',
+  'Madhav Furniture Bulandshahr',
+  'Madhav Furniture UP',
+  'Madhav Furniture showroom',
+  'Designer Bed With Wall Matching Set',
+  'Designer Double Bed',
+  'L Shape Sofa Set',
+  'solid wood furniture India',
   'luxury furniture India',
   'architectural furniture',
-  'solid wood furniture India',
   'curved boucle sofa',
   'travertine dining table',
   'solid oak bed',
   'American walnut furniture',
-  'bespoke luxury furniture',
-  'Bengaluru furniture showroom',
-  'Indiranagar furniture studio',
-  'Mumbai Worli furniture gallery',
-  'interior design consultation India',
   'white glove furniture delivery',
 ];
 
@@ -181,15 +188,35 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
     '@type': 'FurnitureStore',
     '@id': `${siteUrl}/#organization`,
     name: SITE_NAME,
+    alternateName: [
+      'Madhav Furnitures',
+      'Madhav Furniture Studio',
+      'Madhav Furniture & Electronics',
+    ],
     legalName: SITE_LEGAL_NAME,
     url: siteUrl,
     logo: toAbsoluteUrl('/madhav-logo.png'),
     image: toAbsoluteUrl(DEFAULT_OG_IMAGE_PATH),
     description: DEFAULT_DESCRIPTION,
     telephone: PHONE_E164,
-    priceRange: '₹₹₹₹',
+    priceRange: '₹₹₹',
     currenciesAccepted: 'INR',
-    sameAs: [WHATSAPP_CONTACT_URL],
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress:
+        "Above BDS Convent School, Teacher's Colony, Old NH 91, Bulandshahr Road",
+      addressLocality: 'Sikandrabad',
+      addressRegion: 'Uttar Pradesh',
+      postalCode: '203205',
+      addressCountry: 'IN',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 28.4503,
+      longitude: 77.6975,
+    },
+    hasMap: GOOGLE_MAPS_PROFILE_URL,
+    sameAs: [WHATSAPP_CONTACT_URL, GOOGLE_MAPS_PROFILE_URL],
     contactPoint: [
       {
         '@type': 'ContactPoint',

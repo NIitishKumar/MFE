@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const alt =
-  'Madhav Furnitures — Luxury Solid Wood & Architectural Furniture India';
+  'Madhav Furniture — Luxury Solid Wood & Modern Furniture India';
 export const size = {
   width: 1200,
   height: 630,
@@ -41,7 +41,7 @@ export default function OpenGraphImage() {
               fontWeight: 600,
             }}
           >
-            MADHAV FURNITURES • STUDIO & SHOWROOM
+            MADHAV FURNITURE • OFFICIAL STORE & SHOWROOM
           </span>
           <span
             style={{
@@ -49,7 +49,7 @@ export default function OpenGraphImage() {
               color: '#BFB3A4',
             }}
           >
-            Bengaluru • Mumbai
+            Sikandrabad (UP) • Pan-India Delivery
           </span>
         </div>
 
@@ -69,7 +69,7 @@ export default function OpenGraphImage() {
               color: '#FDFBF7',
             }}
           >
-            Architectural Furniture Crafted for Modern Living.
+            Madhav Furniture — Solid Wood, Designer Beds & Luxury Living.
           </div>
           <div
             style={{
@@ -78,8 +78,8 @@ export default function OpenGraphImage() {
               color: '#DDD3C5',
             }}
           >
-            Hand-honed travertine dining tables, curved bouclé sofas, solid oak
-            beds, and bespoke interior curation across India.
+            Designer double beds, wall matching sets, L-shape sofas, travertine
+            dining tables, and bespoke craftsmanship in Sikandrabad & across India.
           </div>
         </div>
 
