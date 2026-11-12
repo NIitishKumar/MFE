@@ -4,7 +4,12 @@
  * Automatically guarantees the '/api/v1' prefix is included.
  */
 function resolveApiBaseUrl(): string {
-  const envUrl = (process.env.NEXT_PUBLIC_API_URL || '').trim();
+  const envUrl = (
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    process.env.API_BASE_URL ||
+    ''
+  ).trim();
 
   // If no environment variable is provided, default to http://localhost:3001/api/v1
   if (!envUrl) {
@@ -19,4 +24,4 @@ function resolveApiBaseUrl(): string {
 }
 
 export const NEXT_PUBLIC_API_BASE_URL = resolveApiBaseUrl();
-
+export const API_BASE_URL = NEXT_PUBLIC_API_BASE_URL;
