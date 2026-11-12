@@ -3,7 +3,7 @@ import {
   CreateProductAttributeDto,
   UpdateProductAttributeDto,
 } from '../types/productAttribute.types';
-import { API_BASE_URL } from '@/config/api.config';
+import { NEXT_PUBLIC_API_BASE_URL } from '@/config/api.config';
 
 const STORAGE_KEY = 'mfe_admin_furniture_attributes_v1';
 
@@ -92,11 +92,11 @@ function normalizeAttribute(raw: any): ProductAttribute {
     productId: String(productDoc?._id || productDoc?.id || raw.productId || raw.product_id || ''),
     product: productDoc
       ? {
-          id: String(productDoc._id || productDoc.id || productDoc.uniqueId || ''),
-          uniqueId: String(productDoc.uniqueId || productDoc._id || productDoc.id || ''),
-          name: productDoc.name || '',
-          slug: productDoc.slug || '',
-        }
+        id: String(productDoc._id || productDoc.id || productDoc.uniqueId || ''),
+        uniqueId: String(productDoc.uniqueId || productDoc._id || productDoc.id || ''),
+        name: productDoc.name || '',
+        slug: productDoc.slug || '',
+      }
       : undefined,
     name: raw.name || '',
     value: raw.value || '',
@@ -133,8 +133,8 @@ export const productAttributeService = {
   async getAll(productId?: string): Promise<{ data: ProductAttribute[]; fromApi: boolean }> {
     try {
       const url = productId
-        ? `${API_BASE_URL}/product-attributes?productId=${encodeURIComponent(productId)}`
-        : `${API_BASE_URL}/product-attributes`;
+        ? `${NEXT_PUBLIC_API_BASE_URL}/product-attributes?productId=${encodeURIComponent(productId)}`
+        : `${NEXT_PUBLIC_API_BASE_URL}/product-attributes`;
 
       const response = await fetch(url, {
         method: 'GET',
@@ -171,7 +171,7 @@ export const productAttributeService = {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/product-attributes`, {
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-attributes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -239,7 +239,7 @@ export const productAttributeService = {
     if (dto.value !== undefined) payload.value = dto.value.trim();
 
     try {
-      let response = await fetch(`${API_BASE_URL}/product-attributes/${id}`, {
+      let response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-attributes/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -249,7 +249,7 @@ export const productAttributeService = {
       });
 
       if (response.status === 404 || response.status === 405) {
-        response = await fetch(`${API_BASE_URL}/product-attributes/${id}`, {
+        response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-attributes/${id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -308,7 +308,7 @@ export const productAttributeService = {
    */
   async delete(id: string): Promise<{ message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/product-attributes/${id}`, {
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-attributes/${id}`, {
         method: 'DELETE',
         headers: {
           Accept: 'application/json',

@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useAdminTheme } from '../context/AdminThemeContext';
 import { cn } from '@/lib/utils';
-import { API_BASE_URL } from '@/config/api.config';
+import { NEXT_PUBLIC_API_BASE_URL } from '@/config/api.config';
 
 export const AdminDashboardPage: React.FC = () => {
   const { isLight } = useAdminTheme();
@@ -271,7 +271,7 @@ export const AdminDashboardPage: React.FC = () => {
                   : 'text-[#c9a87c] bg-[#1e1b18]'
               )}
             >
-              {API_BASE_URL}
+              {NEXT_PUBLIC_API_BASE_URL}
             </code>
             )
           </span>

@@ -3,7 +3,7 @@ import {
   CreateProductImageDto,
   UpdateProductImageDto,
 } from '../types/productImage.types';
-import { API_BASE_URL } from '@/config/api.config';
+import { NEXT_PUBLIC_API_BASE_URL } from '@/config/api.config';
 
 const STORAGE_KEY = 'mfe_admin_furniture_images_v1';
 
@@ -91,11 +91,11 @@ function normalizeImage(raw: any): ProductImage {
     productId: String(productDoc?._id || productDoc?.id || raw.productId || raw.product_id || ''),
     product: productDoc
       ? {
-          id: String(productDoc._id || productDoc.id || productDoc.uniqueId || ''),
-          uniqueId: String(productDoc.uniqueId || productDoc._id || productDoc.id || ''),
-          name: productDoc.name || '',
-          slug: productDoc.slug || '',
-        }
+        id: String(productDoc._id || productDoc.id || productDoc.uniqueId || ''),
+        uniqueId: String(productDoc.uniqueId || productDoc._id || productDoc.id || ''),
+        name: productDoc.name || '',
+        slug: productDoc.slug || '',
+      }
       : undefined,
     imageUrl: raw.imageUrl || raw.image_url || '',
     altText: raw.altText || raw.alt_text || '',
@@ -104,8 +104,8 @@ function normalizeImage(raw: any): ProductImage {
       typeof raw.isPrimary === 'boolean'
         ? raw.isPrimary
         : typeof raw.is_primary === 'boolean'
-        ? raw.is_primary
-        : false,
+          ? raw.is_primary
+          : false,
     createdAt: raw.createdAt || new Date().toISOString(),
     updatedAt: raw.updatedAt || new Date().toISOString(),
   };
@@ -139,8 +139,8 @@ export const productImageService = {
   async getAll(productId?: string): Promise<{ data: ProductImage[]; fromApi: boolean }> {
     try {
       const url = productId
-        ? `${API_BASE_URL}/product-images?productId=${encodeURIComponent(productId)}`
-        : `${API_BASE_URL}/product-images`;
+        ? `${NEXT_PUBLIC_API_BASE_URL}/product-images?productId=${encodeURIComponent(productId)}`
+        : `${NEXT_PUBLIC_API_BASE_URL}/product-images`;
 
       const response = await fetch(url, {
         method: 'GET',
@@ -157,11 +157,11 @@ export const productImageService = {
           const list = rawList.map(normalizeImage);
           const filtered = productId
             ? list.filter(
-                (img) =>
-                  img.productId === productId ||
-                  img.product?.id === productId ||
-                  img.product?.uniqueId === productId
-              )
+              (img) =>
+                img.productId === productId ||
+                img.product?.id === productId ||
+                img.product?.uniqueId === productId
+            )
             : list;
           return { data: filtered, fromApi: true };
         }
@@ -186,7 +186,7 @@ export const productImageService = {
     try {
       // 1. Try querying with ?productId=
       const response = await fetch(
-        `${API_BASE_URL}/product-images?productId=${encodeURIComponent(cleanId)}`,
+        `${NEXT_PUBLIC_API_BASE_URL}/product-images?productId=${encodeURIComponent(cleanId)}`,
         {
           method: 'GET',
           headers: {
@@ -234,7 +234,7 @@ export const productImageService = {
       }
 
       // 2. Fallback: try fetching all product images and filtering
-      const allRes = await fetch(`${API_BASE_URL}/product-images`, {
+      const allRes = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-images`, {
         method: 'GET',
         headers: { Accept: 'application/json' },
       });
@@ -294,7 +294,7 @@ export const productImageService = {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/product-images`, {
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-images`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -391,7 +391,7 @@ export const productImageService = {
     }
 
     try {
-      let response = await fetch(`${API_BASE_URL}/product-images/${id}`, {
+      let response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-images/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -401,7 +401,7 @@ export const productImageService = {
       });
 
       if (response.status === 404 || response.status === 405) {
-        response = await fetch(`${API_BASE_URL}/product-images/${id}`, {
+        response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-images/${id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -475,7 +475,7 @@ export const productImageService = {
    */
   async delete(id: string): Promise<{ message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/product-images/${id}`, {
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-images/${id}`, {
         method: 'DELETE',
         headers: {
           Accept: 'application/json',

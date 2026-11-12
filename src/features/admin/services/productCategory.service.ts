@@ -3,7 +3,7 @@ import {
   CreateProductCategoryDto,
   UpdateProductCategoryDto,
 } from '../types/productCategory.types';
-import { API_BASE_URL } from '@/config/api.config';
+import { NEXT_PUBLIC_API_BASE_URL } from '@/config/api.config';
 
 function normalizeCategory(raw: Record<string, unknown>): ProductCategory {
   const id = String(raw.id ?? raw.uniqueId ?? raw._id ?? raw.slug ?? `cat-${Date.now()}`);
@@ -21,8 +21,8 @@ function normalizeCategory(raw: Record<string, unknown>): ProductCategory {
       typeof raw.isActive === 'boolean'
         ? raw.isActive
         : typeof raw.is_active === 'boolean'
-        ? raw.is_active
-        : true,
+          ? raw.is_active
+          : true,
     createdAt: raw.createdAt ? String(raw.createdAt) : new Date().toISOString(),
     updatedAt: raw.updatedAt ? String(raw.updatedAt) : new Date().toISOString(),
   };
@@ -34,14 +34,14 @@ export const productCategoryService = {
    */
   async getAll(): Promise<{ data: ProductCategory[]; fromApi: boolean }> {
     try {
-      let response = await fetch(`${API_BASE_URL}/categories`, {
+      let response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/categories`, {
         method: 'GET',
         headers: { Accept: 'application/json' },
         cache: 'no-store',
       });
 
       if (!response.ok) {
-        response = await fetch(`${API_BASE_URL}/product-categories`, {
+        response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-categories`, {
           method: 'GET',
           headers: { Accept: 'application/json' },
           cache: 'no-store',
@@ -78,14 +78,14 @@ export const productCategoryService = {
       is_active: Boolean(dto.is_active),
     };
 
-    let response = await fetch(`${API_BASE_URL}/categories`, {
+    let response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/categories`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify(payload),
     });
 
     if (response.status === 404) {
-      response = await fetch(`${API_BASE_URL}/product-categories`, {
+      response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-categories`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(payload),
@@ -141,14 +141,14 @@ export const productCategoryService = {
       payload.isActive = Boolean(dto.is_active);
     }
 
-    let response = await fetch(`${API_BASE_URL}/categories/${encodeURIComponent(id)}`, {
+    let response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/categories/${encodeURIComponent(id)}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify(payload),
     });
 
     if (response.status === 404 || response.status === 405) {
-      response = await fetch(`${API_BASE_URL}/product-categories/${encodeURIComponent(id)}`, {
+      response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-categories/${encodeURIComponent(id)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(payload),
@@ -173,13 +173,13 @@ export const productCategoryService = {
    * DELETE /api/v1/categories/:id
    */
   async delete(id: string): Promise<{ message: string }> {
-    let response = await fetch(`${API_BASE_URL}/categories/${encodeURIComponent(id)}`, {
+    let response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/categories/${encodeURIComponent(id)}`, {
       method: 'DELETE',
       headers: { Accept: 'application/json' },
     });
 
     if (response.status === 404) {
-      response = await fetch(`${API_BASE_URL}/product-categories/${encodeURIComponent(id)}`, {
+      response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-categories/${encodeURIComponent(id)}`, {
         method: 'DELETE',
         headers: { Accept: 'application/json' },
       });

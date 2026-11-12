@@ -1,5 +1,5 @@
 import { FitSize, CreateFitSizeDto, UpdateFitSizeDto } from '../types/fitSize.types';
-import { API_BASE_URL } from '@/config/api.config';
+import { NEXT_PUBLIC_API_BASE_URL } from '@/config/api.config';
 import { ROOMS } from '@/data/categories';
 
 const STORAGE_KEY = 'mfe_admin_furniture_rooms_v1';
@@ -57,14 +57,14 @@ export const fitSizeService = {
    */
   async getAll(): Promise<{ data: FitSize[]; fromApi: boolean }> {
     try {
-      let response = await fetch(`${API_BASE_URL}/rooms`, {
+      let response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/rooms`, {
         method: 'GET',
         headers: { Accept: 'application/json' },
         cache: 'no-store',
       });
 
       if (!response.ok) {
-        response = await fetch(`${API_BASE_URL}/fit-sizes`, {
+        response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/fit-sizes`, {
           method: 'GET',
           headers: { Accept: 'application/json' },
           cache: 'no-store',
@@ -99,14 +99,14 @@ export const fitSizeService = {
     };
 
     try {
-      let response = await fetch(`${API_BASE_URL}/rooms`, {
+      let response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(payload),
       });
 
       if (response.status === 404) {
-        response = await fetch(`${API_BASE_URL}/fit-sizes`, {
+        response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/fit-sizes`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify(payload),
@@ -160,14 +160,14 @@ export const fitSizeService = {
     if (dto.isActive !== undefined) payload.isActive = Boolean(dto.isActive);
 
     try {
-      let response = await fetch(`${API_BASE_URL}/rooms/${encodeURIComponent(id)}`, {
+      let response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/rooms/${encodeURIComponent(id)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(payload),
       });
 
       if (response.status === 404 || response.status === 405) {
-        response = await fetch(`${API_BASE_URL}/fit-sizes/${encodeURIComponent(id)}`, {
+        response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/fit-sizes/${encodeURIComponent(id)}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify(payload),
@@ -214,7 +214,7 @@ export const fitSizeService = {
    */
   async delete(id: string): Promise<{ message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/rooms/${encodeURIComponent(id)}`, {
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/rooms/${encodeURIComponent(id)}`, {
         method: 'DELETE',
         headers: { Accept: 'application/json' },
       });

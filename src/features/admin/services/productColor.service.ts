@@ -1,5 +1,5 @@
 import { ProductColor, CreateProductColorDto, UpdateProductColorDto } from '../types/productColor.types';
-import { API_BASE_URL } from '@/config/api.config';
+import { NEXT_PUBLIC_API_BASE_URL } from '@/config/api.config';
 
 const STORAGE_KEY = 'mfe_admin_furniture_colors_v1';
 
@@ -119,7 +119,7 @@ export const productColorService = {
    */
   async getAll(): Promise<{ data: ProductColor[]; fromApi: boolean }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/product-colors`, {
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-colors`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -155,7 +155,7 @@ export const productColorService = {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/product-colors`, {
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-colors`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ export const productColorService = {
     if (dto.isActive !== undefined) payload.isActive = Boolean(dto.isActive);
 
     try {
-      let response = await fetch(`${API_BASE_URL}/product-colors/${id}`, {
+      let response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-colors/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -226,7 +226,7 @@ export const productColorService = {
       });
 
       if (response.status === 404 || response.status === 405) {
-        response = await fetch(`${API_BASE_URL}/product-colors/${id}`, {
+        response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-colors/${id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -283,7 +283,7 @@ export const productColorService = {
    */
   async delete(id: string): Promise<{ message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/product-colors/${id}`, {
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-colors/${id}`, {
         method: 'DELETE',
         headers: {
           'Accept': 'application/json',

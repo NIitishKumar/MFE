@@ -18,5 +18,5 @@ function resolveApiBaseUrl(): string {
   return cleanUrl.endsWith('/api/v1') ? cleanUrl : `${cleanUrl}/api/v1`;
 }
 
-export const API_BASE_URL = resolveApiBaseUrl();
+export const NEXT_PUBLIC_API_BASE_URL = resolveApiBaseUrl();
 

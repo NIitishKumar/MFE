@@ -10,7 +10,7 @@ import {
   ProductBadge,
   ProductDimensions,
 } from '@/types';
-import { API_BASE_URL } from '@/config/api.config';
+import { NEXT_PUBLIC_API_BASE_URL } from '@/config/api.config';
 
 function getRequestOptions(): RequestInit {
   return {
@@ -129,8 +129,8 @@ async function requestProductsEndpoint(
     const queryParams = buildProductsQueryParams(filters);
     const qs = queryParams.toString();
     const url = qs
-      ? `${API_BASE_URL}${endpointPath}?${qs}`
-      : `${API_BASE_URL}${endpointPath}`;
+      ? `${NEXT_PUBLIC_API_BASE_URL}${endpointPath}?${qs}`
+      : `${NEXT_PUBLIC_API_BASE_URL}${endpointPath}`;
     const res = await fetch(url, getRequestOptions());
 
     if (res.ok) {
@@ -204,7 +204,7 @@ export async function fetchBestSellerProducts(
 export async function fetchProductById(idOrSlug: string): Promise<Product | null> {
   try {
     const res = await fetch(
-      `${API_BASE_URL}/products/${encodeURIComponent(idOrSlug)}`,
+      `${NEXT_PUBLIC_API_BASE_URL}/products/${encodeURIComponent(idOrSlug)}`,
       getRequestOptions(),
     );
 
@@ -231,7 +231,7 @@ export async function fetchRelatedProducts(
 ): Promise<Product[]> {
   try {
     const res = await fetch(
-      `${API_BASE_URL}/products/${encodeURIComponent(idOrSlug)}/related?limit=${limit}`,
+      `${NEXT_PUBLIC_API_BASE_URL}/products/${encodeURIComponent(idOrSlug)}/related?limit=${limit}`,
       getRequestOptions(),
     );
 
@@ -261,7 +261,7 @@ export async function fetchFeaturedProducts(): Promise<{
   topRated: Product[];
 }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/products/featured`, getRequestOptions());
+    const res = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/products/featured`, getRequestOptions());
 
     if (res.ok) {
       const json = await res.json();
@@ -303,7 +303,7 @@ export async function fetchFeaturedProducts(): Promise<{
  */
 export async function fetchProductFilters(): Promise<ProductFiltersMeta> {
   try {
-    const res = await fetch(`${API_BASE_URL}/products/filters`, getRequestOptions());
+    const res = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/products/filters`, getRequestOptions());
 
     if (res.ok) {
       const json = await res.json();
@@ -346,7 +346,7 @@ function normalizeApiCategory(raw: Record<string, unknown>): Category {
 export async function fetchCategories(): Promise<Category[]> {
   try {
     const res = await fetch(
-      `${API_BASE_URL}/categories`,
+      `${NEXT_PUBLIC_API_BASE_URL}/categories`,
       getRequestOptions(),
     );
 
@@ -370,7 +370,7 @@ export async function fetchCategories(): Promise<Category[]> {
 export async function fetchCategoryBySlug(slug: string): Promise<Category | null> {
   try {
     const res = await fetch(
-      `${API_BASE_URL}/categories/${encodeURIComponent(slug)}`,
+      `${NEXT_PUBLIC_API_BASE_URL}/categories/${encodeURIComponent(slug)}`,
       getRequestOptions(),
     );
 
@@ -393,7 +393,7 @@ export async function fetchCategoryBySlug(slug: string): Promise<Category | null
  */
 export async function fetchCollections(): Promise<Collection[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/collections`, getRequestOptions());
+    const res = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/collections`, getRequestOptions());
 
     if (res.ok) {
       const json = await res.json();
@@ -412,7 +412,7 @@ export async function fetchCollections(): Promise<Collection[]> {
 export async function fetchCollectionBySlug(slug: string): Promise<Collection | null> {
   try {
     const res = await fetch(
-      `${API_BASE_URL}/collections/${encodeURIComponent(slug)}`,
+      `${NEXT_PUBLIC_API_BASE_URL}/collections/${encodeURIComponent(slug)}`,
       getRequestOptions(),
     );
 
@@ -432,7 +432,7 @@ export async function fetchCollectionBySlug(slug: string): Promise<Collection | 
  */
 export async function fetchRooms(): Promise<Room[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/rooms`, getRequestOptions());
+    const res = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/rooms`, getRequestOptions());
 
     if (res.ok) {
       const json = await res.json();
@@ -449,7 +449,7 @@ export async function fetchRooms(): Promise<Room[]> {
  * POST /api/v1/products
  */
 export async function createProduct(payload: Partial<Product>): Promise<{ data: Product; message: string }> {
-  const res = await fetch(`${API_BASE_URL}/products`, {
+  const res = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/products`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify(payload),
@@ -467,7 +467,7 @@ export async function createProduct(payload: Partial<Product>): Promise<{ data: 
  * PATCH /api/v1/products/:id
  */
 export async function updateProduct(id: string, payload: Partial<Product>): Promise<{ data: Product; message: string }> {
-  const res = await fetch(`${API_BASE_URL}/products/${encodeURIComponent(id)}`, {
+  const res = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/products/${encodeURIComponent(id)}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify(payload),
@@ -485,7 +485,7 @@ export async function updateProduct(id: string, payload: Partial<Product>): Prom
  * DELETE /api/v1/products/:id
  */
 export async function deleteProduct(id: string): Promise<{ message: string }> {
-  const res = await fetch(`${API_BASE_URL}/products/${encodeURIComponent(id)}`, {
+  const res = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/products/${encodeURIComponent(id)}`, {
     method: 'DELETE',
     headers: { Accept: 'application/json' },
   });
@@ -532,7 +532,7 @@ export async function uploadImage(
     formData.append('publicId', options.publicId.trim());
   }
 
-  const res = await fetch(`${API_BASE_URL}/upload/image`, {
+  const res = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/upload/image`, {
     method: 'POST',
     body: formData,
   });
@@ -560,7 +560,7 @@ export async function uploadImages(
   files.forEach((file) => formData.append('files', file));
   if (folder) formData.append('folder', folder);
 
-  const res = await fetch(`${API_BASE_URL}/upload/images`, {
+  const res = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/upload/images`, {
     method: 'POST',
     body: formData,
   });
@@ -578,7 +578,7 @@ export async function uploadImages(
  */
 export async function deleteUploadedImage(publicId: string): Promise<{ publicId: string; result: string }> {
   const res = await fetch(
-    `${API_BASE_URL}/upload/image?publicId=${encodeURIComponent(publicId)}`,
+    `${NEXT_PUBLIC_API_BASE_URL}/upload/image?publicId=${encodeURIComponent(publicId)}`,
     { method: 'DELETE' },
   );
 

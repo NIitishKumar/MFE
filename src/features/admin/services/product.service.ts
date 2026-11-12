@@ -3,7 +3,7 @@ import {
   CreateProductDto,
   UpdateProductDto,
 } from '../types/product.types';
-import { API_BASE_URL } from '@/config/api.config';
+import { NEXT_PUBLIC_API_BASE_URL } from '@/config/api.config';
 import { buildProductsQueryParams } from '@/services/api';
 import { FilterState } from '@/types';
 
@@ -15,15 +15,15 @@ function normalizeProduct(raw: Record<string, unknown>): Product {
   const images = Array.isArray(raw.images)
     ? raw.images.map(String)
     : raw.imageUrl || raw.image
-    ? [String(raw.imageUrl ?? raw.image)]
-    : [];
+      ? [String(raw.imageUrl ?? raw.image)]
+      : [];
   const primaryImg = String(raw.imageUrl ?? images[0] ?? raw.image ?? '');
   const rawName = String(raw.name ?? '');
   const slug = String(
     raw.slug ??
-      (rawName
-        ? rawName.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-        : `prod-${Date.now()}`),
+    (rawName
+      ? rawName.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      : `prod-${Date.now()}`),
   );
 
   return {
@@ -91,8 +91,8 @@ export const productService = {
       const params = buildProductsQueryParams(query);
       const qs = params.toString();
       const url = qs
-        ? `${API_BASE_URL}/products?${qs}`
-        : `${API_BASE_URL}/products`;
+        ? `${NEXT_PUBLIC_API_BASE_URL}/products?${qs}`
+        : `${NEXT_PUBLIC_API_BASE_URL}/products`;
 
       const response = await fetch(url, {
         method: 'GET',
@@ -105,8 +105,8 @@ export const productService = {
         const rawList = Array.isArray(json)
           ? json
           : Array.isArray(json?.data)
-          ? json.data
-          : [];
+            ? json.data
+            : [];
         const list = rawList.map((item: Record<string, unknown>) =>
           normalizeProduct(item),
         );
@@ -131,7 +131,7 @@ export const productService = {
    */
   async getById(id: string): Promise<{ data: Product; fromApi: boolean }> {
     const response = await fetch(
-      `${API_BASE_URL}/products/${encodeURIComponent(id)}`,
+      `${NEXT_PUBLIC_API_BASE_URL}/products/${encodeURIComponent(id)}`,
       {
         method: 'GET',
         headers: { Accept: 'application/json' },
@@ -176,7 +176,7 @@ export const productService = {
       inStock: dto.inStock ?? true,
     };
 
-    const response = await fetch(`${API_BASE_URL}/products`, {
+    const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/products`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -217,7 +217,7 @@ export const productService = {
     }
 
     let response = await fetch(
-      `${API_BASE_URL}/products/${encodeURIComponent(id)}`,
+      `${NEXT_PUBLIC_API_BASE_URL}/products/${encodeURIComponent(id)}`,
       {
         method: 'PATCH',
         headers: {
@@ -230,7 +230,7 @@ export const productService = {
 
     if (response.status === 404 || response.status === 405) {
       response = await fetch(
-        `${API_BASE_URL}/products/${encodeURIComponent(id)}`,
+        `${NEXT_PUBLIC_API_BASE_URL}/products/${encodeURIComponent(id)}`,
         {
           method: 'PUT',
           headers: {
@@ -261,7 +261,7 @@ export const productService = {
    */
   async delete(id: string): Promise<{ message: string }> {
     const response = await fetch(
-      `${API_BASE_URL}/products/${encodeURIComponent(id)}`,
+      `${NEXT_PUBLIC_API_BASE_URL}/products/${encodeURIComponent(id)}`,
       {
         method: 'DELETE',
         headers: { Accept: 'application/json' },

@@ -3,7 +3,7 @@ import {
   CreateProductVariantDto,
   UpdateProductVariantDto,
 } from '../types/productVariant.types';
-import { API_BASE_URL } from '@/config/api.config';
+import { NEXT_PUBLIC_API_BASE_URL } from '@/config/api.config';
 
 const STORAGE_KEY = 'mfe_admin_furniture_variants_v1';
 
@@ -172,12 +172,12 @@ function normalizeVariant(raw: any): ProductVariant {
   const fitSizeId = raw?.fitSizeId || raw?.fit_size_id || fitSizeRaw?.id || '';
   const fitSize = fitSizeRaw
     ? {
-        id: fitSizeRaw?.id || fitSizeRaw?.uniqueId || fitSizeId,
-        uniqueId: fitSizeRaw?.uniqueId,
-        name: fitSizeRaw?.name || '',
-        fitCode: fitSizeRaw?.fitCode || fitSizeRaw?.fit_code || fitSizeRaw?.code || '',
-        displayOrder: Number(fitSizeRaw?.displayOrder ?? fitSizeRaw?.display_order ?? 0),
-      }
+      id: fitSizeRaw?.id || fitSizeRaw?.uniqueId || fitSizeId,
+      uniqueId: fitSizeRaw?.uniqueId,
+      name: fitSizeRaw?.name || '',
+      fitCode: fitSizeRaw?.fitCode || fitSizeRaw?.fit_code || fitSizeRaw?.code || '',
+      displayOrder: Number(fitSizeRaw?.displayOrder ?? fitSizeRaw?.display_order ?? 0),
+    }
     : undefined;
 
   // Product color normalization
@@ -185,31 +185,31 @@ function normalizeVariant(raw: any): ProductVariant {
   const productColorId = raw?.productColorId || raw?.product_color_id || colorRaw?.id || '';
   const productColor = colorRaw
     ? {
-        id: colorRaw?.id || colorRaw?.uniqueId || productColorId,
-        uniqueId: colorRaw?.uniqueId,
-        name: colorRaw?.name || '',
-        code: colorRaw?.code || '',
-      }
+      id: colorRaw?.id || colorRaw?.uniqueId || productColorId,
+      uniqueId: colorRaw?.uniqueId,
+      name: colorRaw?.name || '',
+      code: colorRaw?.code || '',
+    }
     : undefined;
 
   // Product normalization
   const prodRaw = raw?.product;
   const product = prodRaw
     ? {
-        id: prodRaw?.id || prodRaw?.uniqueId || productId,
-        uniqueId: prodRaw?.uniqueId,
-        name: prodRaw?.name || '',
-        slug: prodRaw?.slug || '',
-        basePrice: prodRaw?.basePrice != null ? Number(prodRaw.basePrice) : undefined,
-      }
+      id: prodRaw?.id || prodRaw?.uniqueId || productId,
+      uniqueId: prodRaw?.uniqueId,
+      name: prodRaw?.name || '',
+      slug: prodRaw?.slug || '',
+      basePrice: prodRaw?.basePrice != null ? Number(prodRaw.basePrice) : undefined,
+    }
     : undefined;
 
   const compareAtPrice =
     raw?.compareAtPrice !== undefined && raw?.compareAtPrice !== null
       ? Number(raw.compareAtPrice)
       : raw?.compare_at_price !== undefined && raw?.compare_at_price !== null
-      ? Number(raw.compare_at_price)
-      : null;
+        ? Number(raw.compare_at_price)
+        : null;
 
   return {
     id: String(id),
@@ -238,8 +238,8 @@ export const productVariantService = {
   async getAll(productId?: string): Promise<{ data: ProductVariant[]; fromApi: boolean }> {
     try {
       const url = productId
-        ? `${API_BASE_URL}/product-variants?productId=${encodeURIComponent(productId)}`
-        : `${API_BASE_URL}/product-variants`;
+        ? `${NEXT_PUBLIC_API_BASE_URL}/product-variants?productId=${encodeURIComponent(productId)}`
+        : `${NEXT_PUBLIC_API_BASE_URL}/product-variants`;
 
       const response = await fetch(url, {
         headers: { Accept: 'application/json' },
@@ -271,7 +271,7 @@ export const productVariantService = {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/product-variants/${encodeURIComponent(cleanId)}`, {
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-variants/${encodeURIComponent(cleanId)}`, {
         headers: { Accept: 'application/json' },
       });
 
@@ -332,7 +332,7 @@ export const productVariantService = {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/product-variants`, {
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-variants`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -434,7 +434,7 @@ export const productVariantService = {
     }
 
     try {
-      let response = await fetch(`${API_BASE_URL}/product-variants/${id}`, {
+      let response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-variants/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -445,7 +445,7 @@ export const productVariantService = {
 
       if (!response.ok && response.status === 404) {
         // Fallback to PUT if backend implements PUT
-        response = await fetch(`${API_BASE_URL}/product-variants/${id}`, {
+        response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-variants/${id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -516,7 +516,7 @@ export const productVariantService = {
    */
   async delete(id: string): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/product-variants/${id}`, {
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/product-variants/${id}`, {
         method: 'DELETE',
         headers: { Accept: 'application/json' },
       });
